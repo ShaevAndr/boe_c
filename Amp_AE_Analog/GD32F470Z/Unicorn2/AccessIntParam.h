@@ -1,0 +1,21 @@
+/*=============================================================================
+2     Project: 
+3     Platform: STM32G743
+4     Filename: AccessIntParam.h
+5     Description:
+6     Version: 0.0
+7     Created: 2025.01.28
+8     Last modified: 2025.01.28
+9============================================================================*/
+#ifndef AccessIntParam_H
+#define AccessIntParam_H
+	//--------------------------------------------------------------------------//
+	#include <stdint.h>
+	//--------------------------------------------------------------------------//
+	#include "CommandList.h"
+	#include "CommandParser.h"
+	//--------------------------------------------------------------------------//
+	int8_t AccessIntParam (IntParam_t NumParam, int32_t * Value, ParamAccessMode_t AccessMode);
+	int8_t AccessDescIntParam (IntParam_t NumParam, DescriptParam_t * P);
+	//--------------------------------------------------------------------------//
+#endif //AccessIntParam_H

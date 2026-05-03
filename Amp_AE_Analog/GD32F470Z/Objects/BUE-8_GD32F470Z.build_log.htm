@@ -1,0 +1,128 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.43.1.0
+Copyright (C) 2025 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: andrew shaev, home, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.43.0.0
+Toolchain Path:  C:\Users\Home\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin
+C Compiler:      ArmClang.exe V6.24
+Assembler:       Armasm.exe V6.24
+Linker/Locator:  ArmLink.exe V6.24
+Library Manager: ArmAr.exe V6.24
+Hex Converter:   FromElf.exe V6.24
+CPU DLL:         SARMCM3.DLL V5.43.0.0
+Dialog DLL:      DCM.DLL V1.17.5.0
+Target DLL:      UL2CM3.DLL V1.164.16.0
+Dialog DLL:      TCM.DLL V1.56.6.0
+ 
+<h2>Project:</h2>
+C:\Users\Home\Desktop\BUE-8_v3\Amp_AE_Analog\GD32F470Z\BUE-8_GD32F470Z.uvprojx
+Project File Date:  05/01/2026
+
+<h2>Output:</h2>
+*** Using Compiler 'V6.24', folder: 'C:\Users\Home\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
+Build target 'Target 1'
+Error instantiating RTE components
+Error #541: 'GigaDevice::Device:Startup@3.0.3' component is missing (previously found in pack 'GigaDevice::GD32F4xx_DFP@3.1.0')
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                https://www.keil.com/pack/ARM.CMSIS.6.3.0.pack
+                ARM::CMSIS@6.3.0
+                CMSIS (Common Microcontroller Software Interface Standard)
+   * Component: CORE Version: 6.2.0
+
+Package Vendor: GigaDevice
+                https://gd32mcu.com/data/documents/pack/GigaDevice.GD32F4xx_DFP.3.0.3.pack
+                GigaDevice::GD32F4xx_DFP@3.0.3
+                GigaDevice GD32F4xx Series Device Support and Examples
+   * Component: Libopt Version: 3.0.2
+   * Component: ADC Version: 3.0.2
+   * Component: CRC Version: 3.0.2
+   * Component: DBG Version: 3.0.2
+   * Component: DMA Version: 3.0.2
+   * Component: FMC Version: 3.0.2
+   * Component: GPIO Version: 3.0.2
+   * Component: MISC Version: 3.0.2
+   * Component: PMU Version: 3.0.2
+   * Component: RCU Version: 3.0.2
+   * Component: SPI_I2S Version: 3.0.2
+   * Component: SYSCFG Version: 3.0.2
+   * Component: TIMER Version: 3.0.2
+   * Component: USART Version: 3.0.2
+
+<h2>Collection of Component include folders:</h2>
+  ./RTE/_Target_1
+  C:/Users/Home/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+  C:/Users/Home/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.0.3/Device/F4XX/Firmware/Peripherals/inc
+  C:/Users/Home/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.0.3/Device/F4XX/Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE@6.2.0
+
+   * Component: GigaDevice::Device:Libopt@3.0.2
+      Include file:  Device/F4XX/Include/gd32f4xx_libopt.h
+
+   * Component: GigaDevice::Device:StdPeripherals:ADC@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_adc.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_adc.h
+
+   * Component: GigaDevice::Device:StdPeripherals:CRC@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_crc.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_crc.c
+
+   * Component: GigaDevice::Device:StdPeripherals:DBG@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_dbg.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_dbg.h
+
+   * Component: GigaDevice::Device:StdPeripherals:DMA@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_dma.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_dma.c
+
+   * Component: GigaDevice::Device:StdPeripherals:FMC@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_fmc.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_fmc.c
+
+   * Component: GigaDevice::Device:StdPeripherals:GPIO@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_gpio.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_gpio.h
+
+   * Component: GigaDevice::Device:StdPeripherals:MISC@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_misc.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_misc.c
+
+   * Component: GigaDevice::Device:StdPeripherals:PMU@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_pmu.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_pmu.c
+
+   * Component: GigaDevice::Device:StdPeripherals:RCU@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_rcu.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_rcu.h
+
+   * Component: GigaDevice::Device:StdPeripherals:SPI_I2S@3.0.2
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_spi.h
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_spi.c
+
+   * Component: GigaDevice::Device:StdPeripherals:SYSCFG@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_syscfg.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_syscfg.h
+
+   * Component: GigaDevice::Device:StdPeripherals:TIMER@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_timer.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_timer.h
+
+   * Component: GigaDevice::Device:StdPeripherals:USART@3.0.2
+      Source file:   Device/F4XX/Firmware/Peripherals/src/gd32f4xx_usart.c
+      Include file:  Device/F4XX/Firmware/Peripherals/inc/gd32f4xx_usart.h
+Target not created.
+Build Time Elapsed:  00:00:00
+</pre>
+</body>
+</html>
