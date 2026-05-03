@@ -963,6 +963,46 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>modbus</GroupName>
+          <Files>
+            <File>
+              <FileName>CommandParcerModbus.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\CommandParcerModbus.h</FilePath>
+            </File>
+            <File>
+              <FileName>CommandParcerModbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\CommandParcerModbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadHoldingRegisters.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ReadHoldingRegisters.h</FilePath>
+            </File>
+            <File>
+              <FileName>WriteSingleRegister.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\WriteSingleRegister.h</FilePath>
+            </File>
+            <File>
+              <FileName>WriteMultipleRegisters.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\WriteMultipleRegisters.h</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusUtils.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ModbusUtils.h</FilePath>
+            </File>
+            <File>
+              <FileName>ErrorHandler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ErrorHandler.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
