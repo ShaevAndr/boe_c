@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>HXTAL_VALUE=8000000,__Aplication__</Define>
               <Undefine></Undefine>
-              <IncludePath>.\LittleFS;.\Unicorn2;.\Global</IncludePath>
+              <IncludePath>.\LittleFS;.\Unicorn2;.\Global;.\Modbus</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -968,37 +968,82 @@
             <File>
               <FileName>CommandParcerModbus.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\CommandParcerModbus.h</FilePath>
+              <FilePath>.\Modbus\CommandParcerModbus.h</FilePath>
             </File>
             <File>
               <FileName>CommandParcerModbus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\CommandParcerModbus.c</FilePath>
-            </File>
-            <File>
-              <FileName>ReadHoldingRegisters.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\ReadHoldingRegisters.h</FilePath>
-            </File>
-            <File>
-              <FileName>WriteSingleRegister.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\WriteSingleRegister.h</FilePath>
-            </File>
-            <File>
-              <FileName>WriteMultipleRegisters.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\WriteMultipleRegisters.h</FilePath>
-            </File>
-            <File>
-              <FileName>ModbusUtils.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\ModbusUtils.h</FilePath>
+              <FilePath>.\Modbus\CommandParcerModbus.c</FilePath>
             </File>
             <File>
               <FileName>ErrorHandler.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\ErrorHandler.h</FilePath>
+              <FilePath>.\Modbus\ErrorHandler.h</FilePath>
+            </File>
+            <File>
+              <FileName>ErrorHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ErrorHandler.c</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusRtuFrame.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\ModbusRtuFrame.h</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusRtuFrame.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ModbusRtuFrame.c</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusUtils.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\ModbusUtils.h</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusUtils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ModbusUtils.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadHoldingRegisters.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\ReadHoldingRegisters.h</FilePath>
+            </File>
+            <File>
+              <FileName>ReadHoldingRegisters.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ReadHoldingRegisters.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadInputRegisters.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\ReadInputRegisters.h</FilePath>
+            </File>
+            <File>
+              <FileName>ReadInputRegisters.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ReadInputRegisters.c</FilePath>
+            </File>
+            <File>
+              <FileName>WriteSingleRegister.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\WriteSingleRegister.h</FilePath>
+            </File>
+            <File>
+              <FileName>WriteSingleRegister.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\WriteSingleRegister.c</FilePath>
+            </File>
+            <File>
+              <FileName>WriteMultipleRegisters.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\WriteMultipleRegisters.h</FilePath>
+            </File>
+            <File>
+              <FileName>WriteMultipleRegisters.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\WriteMultipleRegisters.c</FilePath>
             </File>
           </Files>
         </Group>
