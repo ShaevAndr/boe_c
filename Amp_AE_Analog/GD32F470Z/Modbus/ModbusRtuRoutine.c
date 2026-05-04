@@ -18,15 +18,37 @@
 #include "ModbusRtuRoutine.h"
 #include "ModbusRtuFrame.h"
 //--------------------------------------------------------------------------//
-// Inter-frame silence timeout in microseconds
-// Modbus RTU spec: 3.5 character times
-// At 9600 baud: ~4ms, at 115200: ~0.3ms
-// Using 5ms as safe default for all baud rates
-#define MODBUS_RTU_SILENCE_TIMEOUT_US  5000
+// Extra silence added to calculated t3.5 timeout (microseconds).
+// Increase if frames are being split, decrease for faster response.
+#define MODBUS_RTU_SILENCE_EXTRA_US  200
+//--------------------------------------------------------------------------//
+// Minimum silence timeout (microseconds).
+// Modbus spec recommends fixed 1750us for baud > 19200.
+#define MODBUS_RTU_SILENCE_MIN_US  1750
 //--------------------------------------------------------------------------//
 #define MODBUS_RTU_MAX_FRAME_SIZE  256
 //--------------------------------------------------------------------------//
-static uint8_t BuffRtu [_MaxUARTNumber + 1][MODBUS_RTU_MAX_FRAME_SIZE];
+static uint8_t  BuffRtu [_MaxUARTNumber + 1][MODBUS_RTU_MAX_FRAME_SIZE];
+static uint32_t RtuSilenceTimeoutUs [_MaxUARTNumber + 1];
+//--------------------------------------------------------------------------//
+// Calculate inter-frame silence timeout from baudrate.
+// Modbus RTU: 1 char = 11 bits (start + 8 data + parity + stop)
+// t3.5 = 3.5 * 11 / baudrate * 1000000 = 38500000 / baudrate (us)
+// For baud > 19200, spec says use fixed 1750us.
+static uint32_t CalcSilenceTimeoutUs(uint32_t baudrate)
+{
+	uint32_t t35;
+
+	if (baudrate == 0)
+		return MODBUS_RTU_SILENCE_MIN_US + MODBUS_RTU_SILENCE_EXTRA_US;
+
+	if (baudrate > 19200)
+		t35 = MODBUS_RTU_SILENCE_MIN_US;
+	else
+		t35 = 38500000UL / baudrate;  // 3.5 chars * 11 bits * 1e6
+
+	return t35 + MODBUS_RTU_SILENCE_EXTRA_US;
+}
 //--------------------------------------------------------------------------//
 typedef enum { RtuIdle, RtuReceive, RtuTransmit } TRtuState;
 //--------------------------------------------------------------------------//
@@ -101,7 +123,9 @@ void ModbusRtuRoutine_Init(void)
 {
 	for (int i = 0; i < _RS485_MODBUS_COUNT; i++)
 	{
-		RS485_Init(i, unicorn_uart_speed_to_baudrate(gParamSystem.rs485Modbus[i].UARTSpeed));
+		uint32_t baudrate = unicorn_uart_speed_to_baudrate(gParamSystem.rs485Modbus[i].UARTSpeed);
+		RS485_Init(i, baudrate);
+		RtuSilenceTimeoutUs[i] = CalcSilenceTimeoutUs(baudrate);
 	}
 }
 //--------------------------------------------------------------------------//
@@ -138,7 +162,7 @@ void ModbusRtuRoutine(void)
 						RtuMode[uartNum] = RtuReceive;
 						RtuIndex[uartNum] = 0;
 						BuffRtu[uartNum][RtuIndex[uartNum]++] = rxByte;
-						RtuSilenceTimer[uartNum] = SetTime_us(MODBUS_RTU_SILENCE_TIMEOUT_US);
+						RtuSilenceTimer[uartNum] = SetTime_us(RtuSilenceTimeoutUs[uartNum]);
 						break;
 
 					case RtuReceive:
@@ -147,7 +171,7 @@ void ModbusRtuRoutine(void)
 							BuffRtu[uartNum][RtuIndex[uartNum]++] = rxByte;
 						}
 						// Reset silence timer on each byte
-						RtuSilenceTimer[uartNum] = SetTime_us(MODBUS_RTU_SILENCE_TIMEOUT_US);
+						RtuSilenceTimer[uartNum] = SetTime_us(RtuSilenceTimeoutUs[uartNum]);
 						break;
 
 					case RtuTransmit:
