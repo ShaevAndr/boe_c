@@ -1045,6 +1045,16 @@
               <FileType>1</FileType>
               <FilePath>.\Modbus\WriteMultipleRegisters.c</FilePath>
             </File>
+            <File>
+              <FileName>ModbusRtuRoutine.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\ModbusRtuRoutine.h</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusRtuRoutine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\ModbusRtuRoutine.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
