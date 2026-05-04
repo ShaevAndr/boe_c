@@ -18,9 +18,10 @@
 #include "../Unicorn2/crc16.h"
 #include "../Unicorn2/Unicorn2Routine.h"
 #include "ReadHoldingRegisters.h"
+#include "ReadInputRegisters.h"
 #include "WriteSingleRegister.h"
 #include "WriteMultipleRegisters.h"
-#include "PacketParser.h"
+#include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//
 static char UnitDescriptionBuf [128];
@@ -44,13 +45,18 @@ uint8_t CommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 		case _ReadHoldingRegisters:
 			ErrorNum = ReadHoldingsRegisters(NumUART, Command, Buff, pSize);
 			break;
+		case _ReadInputRegisters:
+			ErrorNum = ReadInputRegisters(NumUART, Command, Buff, pSize);
+			break;
 		case _WriteSingleRegister:
 			ErrorNum = WriteSingleRegister(NumUART, Command, Buff, pSize);
+			break;
 		case _WriteMultipleRegisters:
 			ErrorNum = WriteMultipleRegisters(NumUART, Command, Buff, pSize);
-    default:
-      ErrorNum = _ErrorUnKnowComand;
-      break;
+			break;
+		default:
+			ErrorNum = _IllegalFunction;
+			break;
   }
   return (ErrorNum);
 }

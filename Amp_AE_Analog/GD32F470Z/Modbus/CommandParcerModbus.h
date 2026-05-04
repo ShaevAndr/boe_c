@@ -35,15 +35,15 @@
 	#define _NoError              0xff //??? ?????? (??? ?????. ?????????????)
 	
 	//------------------------------------------------------------------------------
-  //Modbus Functions
-	#define _Read Coils 						0x01
-	#define _ReadDiscreteInputs 		0x02
-	#define _ReadHoldingRegisters 	0x03
-	#define _ReadInputRegisters 		0x04
+  //Modbus Function Codes
+	#define _ReadCoils              0x01
+	#define _ReadDiscreteInputs     0x02
+	#define _ReadHoldingRegisters   0x03
+	#define _ReadInputRegisters     0x04
 	#define _WriteSingleCoil        0x05
 	#define _WriteSingleRegister    0x06
-	#define _WriteMultipleCoils     0x15
-	#define _WriteMultipleRegisters 0x16
+	#define _WriteMultipleCoils     0x0F
+	#define _WriteMultipleRegisters 0x10
 
 	//------------------------------------------------------------------------------
 	uint8_t CommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize);
