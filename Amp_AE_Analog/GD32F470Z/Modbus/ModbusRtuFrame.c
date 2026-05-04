@@ -57,7 +57,7 @@ void ModbusRtuFrame_Process(uint8_t NumUART, uint8_t *Buff, uint32_t *pSize, uin
 	}
 
 	uint8_t fc = pdu[0];
-	uint8_t error = CommandProcess(NumUART, pdu, &pduSize);
+	uint8_t error = ModbusCommandProcess(NumUART, pdu, &pduSize);
 
 	// No response to broadcast
 	if (isBroadcast)
