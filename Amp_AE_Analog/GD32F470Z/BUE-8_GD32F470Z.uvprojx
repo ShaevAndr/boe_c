@@ -10,13 +10,13 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>GD32F470ZI</Device>
           <Vendor>GigaDevice</Vendor>
-          <PackID>GigaDevice.GD32F4xx_DFP.3.0.3</PackID>
+          <PackID>GigaDevice.GD32F4xx_DFP.3.1.0</PackID>
           <PackURL>https://gd32mcu.com/data/documents/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0B0000) IRAM2(0x10000000,0x010000) IROM(0x08000000,0x0200000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -186,7 +186,6 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -276,7 +275,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8020000</StartAddress>
+                <StartAddress>0x8000000</StartAddress>
                 <Size>0x1e0000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -1077,7 +1076,7 @@
           <targetInfo name="Target 1" versionMatchMode="fixed"/>
         </targetInfos>
       </package>
-      <package name="GD32F4xx_DFP" vendor="GigaDevice" version="3.0.3">
+      <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0">
         <targetInfos>
           <targetInfo name="Target 1" versionMatchMode="fixed"/>
         </targetInfos>
@@ -1085,97 +1084,97 @@
     </packages>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.2.0" condition="ARMv6_7_8-M Device" ymlID="CMSIS:CORE">
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.2.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.53" url="https://www.keil.com/pack/" vendor="ARM" version="6.3.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="Libopt" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx CMSIS" ymlID="Device:Libopt">
+      <component Cclass="Device" Cgroup="Libopt" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx CMSIS">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.0.3" condition="GD32F470">
+      <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F470">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="ADC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:ADC">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="ADC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="CRC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:CRC">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="CRC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="DBG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:DBG">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="DBG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="DMA" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:DMA">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="DMA" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="FMC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:FMC">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="FMC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="GPIO" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:GPIO">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="GPIO" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="MISC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx CMSIS" ymlID="Device:StdPeripherals:MISC">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="MISC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx CMSIS">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="PMU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:PMU">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="PMU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="RCU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS MISC" ymlID="Device:StdPeripherals:RCU">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="RCU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS MISC">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="SPI_I2S" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:SPI_I2S">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="SPI_I2S" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="SYSCFG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:SYSCFG">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="SYSCFG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="TIMER" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:TIMER">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="TIMER" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="StdPeripherals" Csub="USART" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU" ymlID="Device:StdPeripherals:USART">
+      <component Cclass="Device" Cgroup="StdPeripherals" Csub="USART" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU">
         <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
@@ -1186,7 +1185,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_adc.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_adc.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="ADC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1194,7 +1193,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_crc.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_crc.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="CRC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1202,7 +1201,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_dbg.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_dbg.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="DBG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1210,7 +1209,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_dma.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_dma.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="DMA" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1218,7 +1217,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_fmc.c" version="3.3.0">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_fmc.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="FMC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1226,7 +1225,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_gpio.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_gpio.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="GPIO" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1234,7 +1233,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_misc.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_misc.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="MISC" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx CMSIS"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1242,7 +1241,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_pmu.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_pmu.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="PMU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1250,7 +1249,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_rcu.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_rcu.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="RCU" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS MISC"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1258,7 +1257,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_spi.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_spi.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="SPI_I2S" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1266,7 +1265,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_syscfg.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_syscfg.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="SYSCFG" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1274,7 +1273,7 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_timer.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_timer.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="TIMER" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -1282,23 +1281,23 @@
       <file attr="config" category="source" name="Device\F4XX\Firmware\Peripherals\src\gd32f4xx_usart.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\gd32f4xx_usart.c</instance>
         <component Cclass="Device" Cgroup="StdPeripherals" Csub="USART" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F4xx 4XX_STDPERIPHERALS RCU"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.0.3"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" condition="Compiler ARMCC" name="Device\F4XX\Source\ARM\startup_gd32f450_470.s" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\startup_gd32f450_470.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.3.0" condition="GD32F470"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com" vendor="GigaDevice" version="3.4.0"/>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F470"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" name="Device\F4XX\Source\system_gd32f4xx.c" version="3.0.2">
         <instance index="0">RTE\Device\GD32F470ZI\system_gd32f4xx.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.3.0" condition="GD32F470"/>
-        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com" vendor="GigaDevice" version="3.4.0"/>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="GigaDevice" Cversion="3.0.2" condition="GD32F470"/>
+        <package name="GD32F4xx_DFP" schemaVersion="1.1" url="https://gd32mcu.com/data/documents/pack/" vendor="GigaDevice" version="3.1.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>

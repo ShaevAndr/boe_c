@@ -4,8 +4,8 @@
 	//--------------------------------------------------------------------------//
 	//#include <stdint.h>
 	//--------------------------------------------------------------------------//
-	#define _ExWDTEnable
-//	#undef _ExWDTEnable
+//	#define _ExWDTEnable
+	#undef _ExWDTEnable
 	//--------------------------------------------------------------------------//
 	void Disable_ExWDT (void);
 	void Enable_ExWDT (void);
