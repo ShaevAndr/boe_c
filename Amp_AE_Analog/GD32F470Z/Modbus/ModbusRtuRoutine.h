@@ -17,6 +17,7 @@
 //------------------------------------------------------------------------------
 void ModbusRtuRoutine(void);
 void ModbusRtuRoutine_Init(void);
+uint32_t ModbusRtuGetFrameErrors(uint8_t uartNum);
 //------------------------------------------------------------------------------
 
 #endif

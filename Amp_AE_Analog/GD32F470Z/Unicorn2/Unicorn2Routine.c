@@ -126,10 +126,10 @@ static uint8_t PopRxFIFO (uint8_t N)
 	int32_t TCPNum;
 	switch (N)
 	{
-		case 0: return (RS485_PopRxFIFO (_RS485_1));
-		case 1: return (RS485_PopRxFIFO (_RS485_2));
-		case 2: return (RS485_PopRxFIFO (_RS485_3));
-		default: 
+		case 0: return (RS485_PopRxFIFO (_RS485_1).byte);
+		case 1: return (RS485_PopRxFIFO (_RS485_2).byte);
+		case 2: return (RS485_PopRxFIFO (_RS485_3).byte);
+		default:
 //			TCPNum = N - _RS485_MODBUS_COUNT;
 //			if (TCPNum >= 0 && TCPNum < _MAX_UNICORN2_TCP_SESSIONS_COUNT)
 //				return (uint32_t)(unicorn2_tcp_get_byte (TCPNum));

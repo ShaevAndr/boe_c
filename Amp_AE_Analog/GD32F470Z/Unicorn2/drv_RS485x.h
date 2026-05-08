@@ -12,7 +12,7 @@
 	#include <gd32f4xx.h>
 	#include <stdint.h>
 	//------------------------------------------------------------------------//
-	typedef enum 
+	typedef enum
 	{
 		_RS485_1      = 0,
 		_RS485_2      = 1,
@@ -20,6 +20,14 @@
 		_RS485_Count  = 3
 	} TRS485_Channel;
 	typedef uint32_t USART_TypeDef;
+	//------------------------------------------------------------------------//
+	// Принятый байт с таймстампом (Timer12, 1 тик = 1 мкс, разрядность 16 бит,
+	// период переполнения 65.536 мс — больше любого Modbus RTU t3.5).
+	typedef struct
+	{
+		uint8_t  byte;
+		uint16_t timestamp;
+	} TRxByte;
 	//------------------------------------------------------------------------//
 	void RS485_SetSpeed (USART_TypeDef * UARTx, uint32_t Speed);
 	USART_TypeDef * GetUART (TRS485_Channel Num);
@@ -36,8 +44,9 @@
 	#undef _DebugFIFO
 
 	void RS485_PushTxFIFO (TRS485_Channel Num, unsigned char b);
-	unsigned char RS485_PopRxFIFO (TRS485_Channel Num);
+	TRxByte RS485_PopRxFIFO (TRS485_Channel Num);
 	int RS485_ReceiveFIFO(TRS485_Channel Num, void *buf, unsigned int buf_size);
+	uint16_t RS485_GetTick (void);
 
 	uint32_t RS485_PushTxFIFOBuf (TRS485_Channel Num, const void *pBuff, uint32_t SizeBuff);
 
