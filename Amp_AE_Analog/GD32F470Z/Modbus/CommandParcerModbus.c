@@ -1,11 +1,11 @@
 /*=============================================================================
-2     Project:
-3     Platform: GD32F470
-4     Filename: CommandParcerModbus.c
-5     Description: Modbus RTU command dispatcher
-6     Version: 1.0
-7     Created: 2017.11.23
-9============================================================================*/
+     Project:
+     Platform: GD32F470
+     Filename: CommandParcerModbus.c
+     Description: Modbus RTU command dispatcher
+     Version: 1.0
+     Created: 2017.11.23
+============================================================================*/
 #include <stdint.h>
 #include <stdbool.h>
 //--------------------------------------------------------------------------//
@@ -16,28 +16,36 @@
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//
+// Minimum request PDU sizes (bytes), enough to read fixed-length headers.
+// Variable-length payload (FC 0x10) is additionally validated by the handler.
+#define MIN_PDU_READ                  5  // FC + StartAddr(2) + Qty(2)
+#define MIN_PDU_WRITE_SINGLE          7  // FC + RegAddr(2) + Value(4)
+#define MIN_PDU_WRITE_MULTIPLE_HDR   10  // FC + StartAddr(2) + Qty(2) + BC(1) + Data(>=4)
+//--------------------------------------------------------------------------//
 uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 {
-  uint8_t ErrorNum = _NoError;
-  uint8_t Command = Buff [0];
+	uint8_t  Command = Buff[0];
+	uint32_t reqSize = *pSize;
 
-  switch (Command)
-  {
+	switch (Command)
+	{
 		case _ReadHoldingRegisters:
-			ErrorNum = ReadHoldingsRegisters(NumUART, Command, Buff, pSize);
-			break;
+			if (reqSize < MIN_PDU_READ) return _IllegalDataValue;
+			return ReadHoldingsRegisters(NumUART, Command, Buff, pSize);
+
 		case _ReadInputRegisters:
-			ErrorNum = ReadInputRegisters(NumUART, Command, Buff, pSize);
-			break;
+			if (reqSize < MIN_PDU_READ) return _IllegalDataValue;
+			return ReadInputRegisters(NumUART, Command, Buff, pSize);
+
 		case _WriteSingleRegister:
-			ErrorNum = WriteSingleRegister(NumUART, Command, Buff, pSize);
-			break;
+			if (reqSize < MIN_PDU_WRITE_SINGLE) return _IllegalDataValue;
+			return WriteSingleRegister(NumUART, Command, Buff, pSize);
+
 		case _WriteMultipleRegisters:
-			ErrorNum = WriteMultipleRegisters(NumUART, Command, Buff, pSize);
-			break;
+			if (reqSize < MIN_PDU_WRITE_MULTIPLE_HDR) return _IllegalDataValue;
+			return WriteMultipleRegisters(NumUART, Command, Buff, pSize);
+
 		default:
-			ErrorNum = _IllegalFunction;
-			break;
-  }
-  return (ErrorNum);
+			return _IllegalFunction;
+	}
 }

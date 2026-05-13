@@ -2,52 +2,37 @@
      Project:
      Platform: GD32F470
      Filename: ModbusUtils.c
-     Description: Modbus register to parameter mapping
-     Version: 1.0
+     Description: Register-to-parameter mapping. One register address = one
+                  4-byte parameter.
+     Version: 2.0
      Created: 2026.05.04
 ============================================================================*/
 #include "ModbusUtils.h"
 #include "../Unicorn2/CommandList.h"
 //--------------------------------------------------------------------------//
-
-// Holding register map:
-//   [0                .. _IPCount*2-1]                    -> INT params
-//   [_IPCount*2       .. _IPCount*2 + _FPCount*2 - 1]    -> FLOAT params
-// Input register map:
-//   [0                .. _TelPCount*2-1]                  -> TELEMETRY params
-
-//--------------------------------------------------------------------------//
-ParamType GetHoldingRegisterMapping(uint16_t regAddr, uint16_t *paramIndex, uint8_t *wordOffset)
+ParamType GetHoldingRegisterMapping(uint16_t regAddr, uint16_t *paramIndex)
 {
-	uint16_t intRegCount = _IPCount * 2;
-	uint16_t floatRegCount = _FPCount * 2;
-
-	if (regAddr < intRegCount)
+	if (regAddr < (uint16_t)_IPCount)
 	{
-		*paramIndex = regAddr / 2;
-		*wordOffset = regAddr % 2;
+		*paramIndex = regAddr;
 		return PARAM_INT;
 	}
 
-	uint16_t floatRegOffset = regAddr - intRegCount;
-	if (floatRegOffset < floatRegCount)
+	uint16_t floatOffset = regAddr - (uint16_t)_IPCount;
+	if (floatOffset < (uint16_t)_FPCount)
 	{
-		*paramIndex = floatRegOffset / 2;
-		*wordOffset = floatRegOffset % 2;
+		*paramIndex = floatOffset;
 		return PARAM_FLOAT;
 	}
 
 	return PARAM_NONE;
 }
 //--------------------------------------------------------------------------//
-ParamType GetInputRegisterMapping(uint16_t regAddr, uint16_t *paramIndex, uint8_t *wordOffset)
+ParamType GetInputRegisterMapping(uint16_t regAddr, uint16_t *paramIndex)
 {
-	uint16_t telemRegCount = _TelPCount * 2;
-
-	if (regAddr < telemRegCount)
+	if (regAddr < (uint16_t)_TelPCount)
 	{
-		*paramIndex = regAddr / 2;
-		*wordOffset = regAddr % 2;
+		*paramIndex = regAddr;
 		return PARAM_TELEMETRY;
 	}
 
@@ -56,10 +41,10 @@ ParamType GetInputRegisterMapping(uint16_t regAddr, uint16_t *paramIndex, uint8_
 //--------------------------------------------------------------------------//
 uint16_t GetHoldingRegisterCount(void)
 {
-	return (_IPCount + _FPCount) * 2;
+	return (uint16_t)(_IPCount + _FPCount);
 }
 //--------------------------------------------------------------------------//
 uint16_t GetInputRegisterCount(void)
 {
-	return _TelPCount * 2;
+	return (uint16_t)_TelPCount;
 }

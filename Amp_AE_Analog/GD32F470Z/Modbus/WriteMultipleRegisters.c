@@ -2,8 +2,9 @@
      Project:
      Platform: GD32F470
      Filename: WriteMultipleRegisters.c
-     Description: Modbus FC 0x10 - Write Multiple Registers
-     Version: 1.0
+     Description: FC 0x10 - Write Multiple Registers / Parameters
+                  (custom 4-byte parameter protocol).
+     Version: 2.0
      Created: 2026.05.04
 ============================================================================*/
 #include <string.h>
@@ -14,121 +15,64 @@
 #include "../Unicorn2/AccessIntParam.h"
 #include "../Unicorn2/AccessFloatParam.h"
 //--------------------------------------------------------------------------//
-// Request PDU:  FC(1) | StartAddr(2) | Quantity(2) | ByteCount(1) | Data(N*2)
-// Response PDU: FC(1) | StartAddr(2) | Quantity(2)
+// Request PDU:  FC(1) | StartAddr(2) | Quantity(2) | ByteCount(1) | Data(4*Q)
+//                                                                          = 6 + 4*Q bytes
+// Response PDU: FC(1) | StartAddr(2) | Quantity(2)                         = 5 bytes
+//   ByteCount = Quantity * 4 (8-bit; quantity capped so it fits in 1 byte).
+//   Each parameter is 4 bytes big-endian.
 //--------------------------------------------------------------------------//
-static uint8_t WriteParamInt(uint16_t paramIndex, uint32_t fullValue)
-{
-	int32_t val = (int32_t)fullValue;
-	int8_t err = AccessIntParam((IntParam_t)paramIndex, &val, _PAM_WO);
-	return (err != (int8_t)_NoError) ? ConvertUnicornErrorIntoModbusError((uint8_t)err) : _NoError;
-}
-//--------------------------------------------------------------------------//
-static uint8_t WriteParamFloat(uint16_t paramIndex, uint32_t fullValue)
-{
-	float fval;
-	memcpy(&fval, &fullValue, sizeof(fval));
-	int8_t err = AccessFloatParam((FloatParam_t)paramIndex, &fval, _PAM_WO);
-	return (err != (int8_t)_NoError) ? ConvertUnicornErrorIntoModbusError((uint8_t)err) : _NoError;
-}
-//--------------------------------------------------------------------------//
-static uint8_t ReadModifyWriteRegister(ParamType type, uint16_t paramIndex, uint8_t wordOffset, uint16_t regValue)
-{
-	uint32_t u;
-	int8_t err;
-
-	if (type == PARAM_INT)
-	{
-		int32_t currentVal;
-		err = AccessIntParam((IntParam_t)paramIndex, &currentVal, _PAM_RO);
-		if (err != (int8_t)_NoError)
-			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
-		u = (uint32_t)currentVal;
-	}
-	else
-	{
-		float fval;
-		err = AccessFloatParam((FloatParam_t)paramIndex, &fval, _PAM_RO);
-		if (err != (int8_t)_NoError)
-			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
-		memcpy(&u, &fval, sizeof(u));
-	}
-
-	if (wordOffset == 0)
-		u = (u & 0x0000FFFF) | ((uint32_t)regValue << 16);
-	else
-		u = (u & 0xFFFF0000) | regValue;
-
-	if (type == PARAM_INT)
-		return WriteParamInt(paramIndex, u);
-	else
-		return WriteParamFloat(paramIndex, u);
-}
+#define WRITE_MAX_QUANTITY  60
 //--------------------------------------------------------------------------//
 uint8_t WriteMultipleRegisters(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSize)
 {
+	uint32_t reqSize   = *pSize;
 	uint16_t startAddr = (uint16_t)(B[1] << 8) | B[2];
 	uint16_t quantity  = (uint16_t)(B[3] << 8) | B[4];
 	uint8_t  byteCount = B[5];
-	uint8_t *data = &B[6];
+	uint8_t *data      = &B[6];
 
-	if (quantity < 1 || quantity > 123 || byteCount != quantity * 2)
+	if (quantity < 1 || quantity > WRITE_MAX_QUANTITY || byteCount != (uint8_t)(quantity * 4))
+		return _IllegalDataValue;
+
+	// Ensure the request actually carries all declared data bytes.
+	if (reqSize < (uint32_t)(6 + byteCount))
 		return _IllegalDataValue;
 
 	if (startAddr + quantity > GetHoldingRegisterCount())
 		return _IllegalDataAddress;
 
-	for (uint16_t i = 0; i < quantity; )
+	for (uint16_t i = 0; i < quantity; i++)
 	{
-		uint16_t regAddr = startAddr + i;
 		uint16_t paramIndex;
-		uint8_t  wordOffset;
-		ParamType type = GetHoldingRegisterMapping(regAddr, &paramIndex, &wordOffset);
+		ParamType type = GetHoldingRegisterMapping(startAddr + i, &paramIndex);
 
 		if (type == PARAM_NONE)
 			return _IllegalDataAddress;
 
-		// Check if we have both halves of this param (aligned pair)
-		uint8_t hasPair = 0;
-		if (wordOffset == 0 && (i + 1) < quantity)
+		uint8_t *src = &data[i * 4];
+		uint32_t raw = ((uint32_t)src[0] << 24)
+		             | ((uint32_t)src[1] << 16)
+		             | ((uint32_t)src[2] << 8)
+		             |  (uint32_t)src[3];
+
+		int8_t err;
+		if (type == PARAM_INT)
 		{
-			uint16_t nextParamIndex;
-			uint8_t  nextWordOffset;
-			ParamType nextType = GetHoldingRegisterMapping(regAddr + 1, &nextParamIndex, &nextWordOffset);
-			if (nextType == type && nextParamIndex == paramIndex && nextWordOffset == 1)
-				hasPair = 1;
+			int32_t newVal = (int32_t)raw;
+			err = AccessIntParam((IntParam_t)paramIndex, &newVal, _PAM_WO);
+		}
+		else // PARAM_FLOAT
+		{
+			float fval;
+			memcpy(&fval, &raw, sizeof(fval));
+			err = AccessFloatParam((FloatParam_t)paramIndex, &fval, _PAM_WO);
 		}
 
-		uint8_t err;
-
-		if (hasPair)
-		{
-			// Full 32-bit write — no read needed
-			uint16_t hi = (uint16_t)(data[i * 2] << 8) | data[i * 2 + 1];
-			uint16_t lo = (uint16_t)(data[(i + 1) * 2] << 8) | data[(i + 1) * 2 + 1];
-			uint32_t fullValue = ((uint32_t)hi << 16) | lo;
-
-			if (type == PARAM_INT)
-				err = WriteParamInt(paramIndex, fullValue);
-			else
-				err = WriteParamFloat(paramIndex, fullValue);
-
-			if (err != _NoError)
-				return err;
-			i += 2;
-		}
-		else
-		{
-			// Single register — read-modify-write
-			uint16_t regValue = (uint16_t)(data[i * 2] << 8) | data[i * 2 + 1];
-			err = ReadModifyWriteRegister(type, paramIndex, wordOffset, regValue);
-			if (err != _NoError)
-				return err;
-			i += 1;
-		}
+		if (err != (int8_t)_NoError)
+			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
 	}
 
-	// Response: FC | StartAddr | Quantity (B[0..4] already correct)
+	// Response: FC | StartAddr | Quantity (B[0..4] already correct).
 	B[0] = Command;
 	*pSize = 5;
 	return _NoError;

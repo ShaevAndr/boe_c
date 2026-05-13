@@ -2,8 +2,9 @@
      Project:
      Platform: GD32F470
      Filename: WriteSingleRegister.c
-     Description: Modbus FC 0x06 - Write Single Register
-     Version: 1.0
+     Description: FC 0x06 - Write Single Register / Parameter
+                  (custom 4-byte parameter protocol).
+     Version: 2.0
      Created: 2026.05.04
 ============================================================================*/
 #include <string.h>
@@ -14,20 +15,21 @@
 #include "../Unicorn2/AccessIntParam.h"
 #include "../Unicorn2/AccessFloatParam.h"
 //--------------------------------------------------------------------------//
-// Request PDU:  FC(1) | RegAddr(2) | Value(2)
-// Response PDU: echo of request
-//
-// Since parameters are 32-bit (2 registers each),
-// writing a single register performs read-modify-write on the affected half.
+// Request PDU:  FC(1) | RegAddr(2) | Value(4)                            = 7 bytes
+// Response PDU: echo of request                                          = 7 bytes
+//   RegAddr = parameter index. Value is the full 4-byte parameter
+//   (big-endian: byte 0 = MSB).
 //--------------------------------------------------------------------------//
 uint8_t WriteSingleRegister(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSize)
 {
 	uint16_t regAddr = (uint16_t)(B[1] << 8) | B[2];
-	uint16_t value   = (uint16_t)(B[3] << 8) | B[4];
+	uint32_t raw     = ((uint32_t)B[3] << 24)
+	                 | ((uint32_t)B[4] << 16)
+	                 | ((uint32_t)B[5] << 8)
+	                 |  (uint32_t)B[6];
 
 	uint16_t paramIndex;
-	uint8_t  wordOffset;
-	ParamType type = GetHoldingRegisterMapping(regAddr, &paramIndex, &wordOffset);
+	ParamType type = GetHoldingRegisterMapping(regAddr, &paramIndex);
 
 	if (type == PARAM_NONE)
 		return _IllegalDataAddress;
@@ -36,43 +38,21 @@ uint8_t WriteSingleRegister(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32
 
 	if (type == PARAM_INT)
 	{
-		int32_t currentVal;
-		err = AccessIntParam((IntParam_t)paramIndex, &currentVal, _PAM_RO);
-		if (err != (int8_t)_NoError)
-			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
-
-		uint32_t u = (uint32_t)currentVal;
-		if (wordOffset == 0)
-			u = (u & 0x0000FFFF) | ((uint32_t)value << 16);
-		else
-			u = (u & 0xFFFF0000) | value;
-
-		int32_t newVal = (int32_t)u;
+		int32_t newVal = (int32_t)raw;
 		err = AccessIntParam((IntParam_t)paramIndex, &newVal, _PAM_WO);
 		if (err != (int8_t)_NoError)
 			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
 	}
-	else if (type == PARAM_FLOAT)
+	else // PARAM_FLOAT
 	{
 		float fval;
-		err = AccessFloatParam((FloatParam_t)paramIndex, &fval, _PAM_RO);
-		if (err != (int8_t)_NoError)
-			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
-
-		uint32_t u;
-		memcpy(&u, &fval, sizeof(u));
-		if (wordOffset == 0)
-			u = (u & 0x0000FFFF) | ((uint32_t)value << 16);
-		else
-			u = (u & 0xFFFF0000) | value;
-		memcpy(&fval, &u, sizeof(fval));
-
+		memcpy(&fval, &raw, sizeof(fval));
 		err = AccessFloatParam((FloatParam_t)paramIndex, &fval, _PAM_WO);
 		if (err != (int8_t)_NoError)
 			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
 	}
 
-	// Response = echo of request (B unchanged)
-	*pSize = 5;
+	// Response = echo of request (B[0..6] unchanged).
+	*pSize = 7;
 	return _NoError;
 }
