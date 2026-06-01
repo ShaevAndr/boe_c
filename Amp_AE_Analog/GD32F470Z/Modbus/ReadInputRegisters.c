@@ -37,14 +37,8 @@ uint8_t ReadInputRegisters(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_
 
 	for (uint16_t i = 0; i < quantity; i++)
 	{
-		uint16_t paramIndex;
-		ParamType type = GetInputRegisterMapping(startAddr + i, &paramIndex);
-
-		if (type == PARAM_NONE)
-			return _IllegalDataAddress;
-
 		float fval;
-		int8_t err = AccessTelemParam((TelimParam_t)paramIndex, &fval);
+		int8_t err = AccessTelemParam(startAddr + i, &fval);
 		if (err != (int8_t)_NoError)
 			return ConvertUnicornErrorIntoModbusError((uint8_t)err);
 
