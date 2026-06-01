@@ -73,6 +73,8 @@ int main (void)
   LoadParamApp (&main_storage);
   loadLockUnlockStatus();
   CommandParserInit();
+	
+	gParamApp.ProtocolMode = PROTOCOL_MODBUS;
 
   if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
   {

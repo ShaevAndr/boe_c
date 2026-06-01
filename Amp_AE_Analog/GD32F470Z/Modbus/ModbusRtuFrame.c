@@ -82,7 +82,7 @@ void ModbusRtuFrame_Process(uint8_t NumUART, uint8_t *Buff, uint32_t *pSize, uin
 	// Normal response: [Addr][ResponsePDU][CRC]
 	Buff[0] = deviceAddress;
 	// ResponsePDU already at Buff[1], length = pduSize
-	uint16_t crc = CRC16(Buff, 1 + pduSize);
+	uint16_t crc = calculate_modbus_crc(Buff, 1 + pduSize);
 	Buff[1 + pduSize]     = (uint8_t)(crc & 0xFF);
 	Buff[1 + pduSize + 1] = (uint8_t)(crc >> 8);
 	*pSize = 1 + pduSize + 2;

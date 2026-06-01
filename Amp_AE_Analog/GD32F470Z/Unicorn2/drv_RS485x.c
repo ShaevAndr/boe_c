@@ -108,7 +108,8 @@ static void RS485_InitGPIO (TRS485_Channel Num)
 	switch (Num)
 	{
 		case _RS485_1:
-			rcu_periph_clock_enable (RCU_GPIOD | RCU_GPIOB);
+			rcu_periph_clock_enable (RCU_GPIOB);
+			rcu_periph_clock_enable (RCU_GPIOD);
 			/* connect port to USART1_T/R */
 			gpio_mode_set (GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, GPIO_PIN_13);
 			gpio_output_options_set (GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, GPIO_PIN_13);
