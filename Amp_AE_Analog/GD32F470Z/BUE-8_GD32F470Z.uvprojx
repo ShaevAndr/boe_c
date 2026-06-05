@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1053,6 +1053,26 @@
               <FileName>ModbusRtuRoutine.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Modbus\ModbusRtuRoutine.c</FilePath>
+            </File>
+            <File>
+              <FileName>ReadFileRecord.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\modbus\ReadFileRecord.h</FilePath>
+            </File>
+            <File>
+              <FileName>ReadFilerecord.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\ReadFilerecord.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>deviceInfo</GroupName>
+          <Files>
+            <File>
+              <FileName>deviceDescription.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\deviceInfo\deviceDescription.h</FilePath>
             </File>
           </Files>
         </Group>

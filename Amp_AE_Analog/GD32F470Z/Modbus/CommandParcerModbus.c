@@ -13,6 +13,7 @@
 #include "ReadInputRegisters.h"
 #include "WriteSingleRegister.h"
 #include "WriteMultipleRegisters.h"
+#include "ReadFileRecord.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//
@@ -21,6 +22,7 @@
 #define MIN_PDU_READ                  5  // FC + StartAddr(2) + Qty(2)
 #define MIN_PDU_WRITE_SINGLE          7  // FC + RegAddr(2) + Value(4)
 #define MIN_PDU_WRITE_MULTIPLE_HDR   10  // FC + StartAddr(2) + Qty(2) + BC(1) + Data(>=4)
+#define MIN_PDU_READ_FILE_RECORD 			9	 // FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2)
 //--------------------------------------------------------------------------//
 uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 {
@@ -44,7 +46,11 @@ uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 		case _WriteMultipleRegisters:
 			if (reqSize < MIN_PDU_WRITE_MULTIPLE_HDR) return _IllegalDataValue;
 			return WriteMultipleRegisters(NumUART, Command, Buff, pSize);
-
+		
+		case _ReadFileRecord:
+			if (reqSize < MIN_PDU_READ_FILE_RECORD) return _IllegalDataValue;
+			return ReadFileRecord(NumUART, Command, Buff, pSize);
+		
 		default:
 			return _IllegalFunction;
 	}

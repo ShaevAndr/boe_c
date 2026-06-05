@@ -74,7 +74,7 @@ int main (void)
   loadLockUnlockStatus();
   CommandParserInit();
 	
-	gParamApp.ProtocolMode = PROTOCOL_MODBUS;
+	gParamApp.ProtocolMode = 1;
 
   if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
   {
@@ -127,6 +127,7 @@ int main (void)
       ModbusRtuRoutine();
     else
       Unicorn2Routine();
+		
     RoutineMonADC0 ();
     RoutineMonADC1 ();
     RoutineMonADC2 ();
