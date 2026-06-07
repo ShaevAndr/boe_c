@@ -1,6 +1,6 @@
 /*=============================================================================
-2     Project: 
-3     Platform: 
+2     Project:
+3     Platform:
 4     Filename: ReadFileRecord.h
 5     Description:
 6     Version: 0.0
@@ -11,11 +11,16 @@
 #ifndef ReadFileRecord_H
 #define ReadFileRecord_H
 #include <stdint.h>
+#include <string.h>
+#include "../deviceInfo/deviceDescription.h"
 
 typedef enum {
 	_DeviceDescription = 1,
 	_ModbusFileCounts
 } modbusFiles;
+
+static const char* GetFileData(uint16_t fileNumber, uint32_t *size);
+
 
 uint8_t ReadFileRecord(uint8_t NumUART, uint8_t Command,	uint8_t * B, uint32_t * pSize);
 #endif
