@@ -1065,6 +1065,7 @@ I (drv_SPI.h)(0x69F842FD)
 I (DeviceTemperatureStatistics.h)(0x69F842FD)
 F (.\DeviceTemperatureStatistics.h)(0x69F842FD)()
 F (.\Unicorn2\CommandList.h)(0x69F84DD4)()
+F (.\Unicorn2\AccessFloatParam.h)(0x69F842FD)()
 F (.\Unicorn2\AccessFloatParam.c)(0x69F842FD)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/accessfloatparam.o -MD)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x60354E20)
@@ -1125,7 +1126,6 @@ I (C:\Users\user\AppData\Local\Arm\Packs\GigaDevice\GD32F4xx_DFP\3.1.0\Device\F4
 I (Unicorn2\CommandParser.h)(0x69F842FD)
 I (Unicorn2\AccessFloatParam.h)(0x69F842FD)
 I (Unicorn2\CommandList.h)(0x69F84DD4)
-F (.\Unicorn2\AccessFloatParam.h)(0x69F842FD)()
 F (.\Unicorn2\AccessIntParam.c)(0x69F84DD4)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/accessintparam.o -MD)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x60354E20)
@@ -1891,28 +1891,31 @@ I (C:\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\assert.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdio.h)(0x60354E24)
 F (.\LittleFS\lfs_util.h)(0x69F842FD)()
-F (.\Modbus\CommandParcerModbus.h)(0x69F84F27)()
-F (.\Modbus\CommandParcerModbus.c)(0x6A04650E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/commandparcermodbus.o -MD)
+F (.\Modbus\CommandParcerModbus.h)(0x6A226D9A)()
+F (.\Modbus\CommandParcerModbus.c)(0x6A226E29)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/commandparcermodbus.o -MD)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\ReadHoldingRegisters.h)(0x69F8432A)
 I (Modbus\ReadInputRegisters.h)(0x69F8432A)
 I (Modbus\WriteSingleRegister.h)(0x69F8432A)
 I (Modbus\WriteMultipleRegisters.h)(0x69F8432A)
+I (Modbus\ReadFileRecord.h)(0x6A2654DB)
+I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x60354E20)
+I (Modbus\..\deviceInfo\deviceDescription.h)(0x6A2654DB)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 F (.\Modbus\ErrorHandler.h)(0x69F8432A)()
 F (.\Modbus\ErrorHandler.c)(0x69F8432A)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/errorhandler.o -MD)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 F (.\Modbus\ModbusRtuFrame.h)(0x69F8432A)()
 F (.\Modbus\ModbusRtuFrame.c)(0x6A06F548)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/modbusrtuframe.o -MD)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\ModbusRtuFrame.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
 I (Modbus\..\Unicorn2\crc16.h)(0x69F842FD)
 F (.\Modbus\ModbusUtils.h)(0x6A04650E)()
@@ -1927,7 +1930,7 @@ I (Modbus\ReadHoldingRegisters.h)(0x69F8432A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (Modbus\ModbusUtils.h)(0x6A04650E)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\..\Unicorn2\AccessIntParam.h)(0x69F842FD)
 I (Unicorn2\CommandList.h)(0x69F84DD4)
@@ -1940,7 +1943,7 @@ I (Modbus\ReadInputRegisters.h)(0x69F8432A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (Modbus\ModbusUtils.h)(0x6A04650E)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\..\Unicorn2\AccessTelemParam.h)(0x69F842FD)
 I (Unicorn2\CommandList.h)(0x69F84DD4)
@@ -1952,7 +1955,7 @@ I (Modbus\WriteSingleRegister.h)(0x69F8432A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (Modbus\ModbusUtils.h)(0x6A04650E)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\..\Unicorn2\AccessIntParam.h)(0x69F842FD)
 I (Unicorn2\CommandList.h)(0x69F84DD4)
@@ -1965,7 +1968,7 @@ I (Modbus\WriteMultipleRegisters.h)(0x69F8432A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
 I (Modbus\ModbusUtils.h)(0x6A04650E)
 I (Modbus\ErrorHandler.h)(0x69F8432A)
-I (Modbus\CommandParcerModbus.h)(0x69F84F27)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (Modbus\..\Unicorn2\AccessIntParam.h)(0x69F842FD)
 I (Unicorn2\CommandList.h)(0x69F84DD4)
@@ -2037,6 +2040,16 @@ I (Modbus\..\Unicorn2\unicorn_uart_speed.h)(0x69F842FD)
 I (Modbus\..\drv_LEDs.h)(0x69F842FD)
 I (Modbus\ModbusRtuRoutine.h)(0x6A02CB40)
 I (Modbus\ModbusRtuFrame.h)(0x69F8432A)
+F (.\modbus\ReadFileRecord.h)(0x6A2654DB)()
+F (.\modbus\ReadFilerecord.c)(0x6A265A7E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/readfilerecord.o -MD)
+I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x60354E20)
+I (Modbus\ReadFileRecord.h)(0x6A2654DB)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60354E20)
+I (Modbus\..\deviceInfo\deviceDescription.h)(0x6A2654DB)
+I (Modbus\ErrorHandler.h)(0x69F8432A)
+I (Modbus\CommandParcerModbus.h)(0x6A226D9A)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
+F (.\deviceInfo\deviceDescription.h)(0x6A2654DB)()
 F (RTE\Device\GD32F470ZI\gd32f4xx_adc.c)(0x69F842FD)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ./LittleFS -I ./Unicorn2 -I ./Global -I ./Modbus-I./RTE/_Target_1-IC:/Users/user/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Firmware/Peripherals/inc-IC:/Users/user/AppData/Local/Arm/Packs/GigaDevice/GD32F4xx_DFP/3.1.0/Device/F4XX/Include-D__UVISION_VERSION="535" -D_RTE_ -DGD32F470 -D_RTE_ -DHXTAL_VALUE="8000000" -D__Aplication__-o ./objects/gd32f4xx_adc.o -MD)
 I (C:\Users\user\AppData\Local\Arm\Packs\GigaDevice\GD32F4xx_DFP\3.1.0\Device\F4XX\Firmware\Peripherals\inc\gd32f4xx_adc.h)(0x63E0EDA6)
 I (C:\Users\user\AppData\Local\Arm\Packs\GigaDevice\GD32F4xx_DFP\3.1.0\Device\F4XX\Include\gd32f4xx.h)(0x63E0EDA8)

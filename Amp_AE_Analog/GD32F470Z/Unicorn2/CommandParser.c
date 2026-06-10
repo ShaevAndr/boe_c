@@ -268,3 +268,15 @@ void CommandParserInit(void)
     deviceDateOfManufactureToStr(manufBuf, sizeof(manufBuf), gParamSystem.device.DateOfManufacture),
     gParamSystem.device.SerialNumber, buildDate, buildTime);
 }
+
+uint8_t getDeviceTypeVersion (uint8_t * Buff, uint32_t * pSize)
+{
+	if (*pSize != 2) return _ErrorSize;
+
+  Buff [0] = _TypeDev / 0x0100;
+  Buff [1] = _TypeDev % 0x0100;
+  Buff [2] = _VerDev / 0x0100;
+  Buff [3] = _VerDev % 0x0100;
+  *pSize = 4 + (uint16_t)sprintf ((char *)(Buff + 6), "%s", UnitDescription);
+	return _NoError;
+}

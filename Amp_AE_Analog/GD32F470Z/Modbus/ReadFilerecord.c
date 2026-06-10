@@ -18,6 +18,7 @@
 
 #define CHUNK_SIZE      245
 #define FILE_REF_TYPE   6
+
 static const char* GetFileData(uint16_t fileNumber, uint32_t *size){
     switch(fileNumber)
     {

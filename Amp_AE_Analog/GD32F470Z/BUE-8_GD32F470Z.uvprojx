@@ -614,14 +614,14 @@
               <FilePath>.\Unicorn2\CommandList.h</FilePath>
             </File>
             <File>
-              <FileName>AccessFloatParam.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Unicorn2\AccessFloatParam.c</FilePath>
-            </File>
-            <File>
               <FileName>AccessFloatParam.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Unicorn2\AccessFloatParam.h</FilePath>
+            </File>
+            <File>
+              <FileName>AccessFloatParam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Unicorn2\AccessFloatParam.c</FilePath>
             </File>
             <File>
               <FileName>AccessIntParam.c</FileName>

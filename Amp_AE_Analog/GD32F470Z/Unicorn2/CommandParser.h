@@ -87,6 +87,7 @@
 	//------------------------------------------------------------------------------
 	bool GetReadDeviceTypeVersion (void);
 	uint8_t CommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize);
+	uint8_t getDeviceTypeVersion (uint8_t * Buff, uint32_t * pSize);
   void CommandParserInit(void);
 	//------------------------------------------------------------------------------
 #endif 
