@@ -16,6 +16,7 @@
 
 typedef enum {
 	_DeviceDescription = 1,
+	_DeviceTypeVersion,
 	_ModbusFileCounts
 } modbusFiles;
 

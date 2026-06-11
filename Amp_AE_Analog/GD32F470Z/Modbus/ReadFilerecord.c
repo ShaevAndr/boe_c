@@ -8,6 +8,7 @@
 ============================================================================*/
 #include <string.h>
 #include "ReadFileRecord.h"
+#include "../Unicorn2/CommandParser.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2)
@@ -23,11 +24,15 @@ static const char* GetFileData(uint16_t fileNumber, uint32_t *size){
     switch(fileNumber)
     {
         case _DeviceDescription:
-            *size = descriptionLength;
-            return DeviceDescription;
-
-        default:
-            return NULL;
+					*size = descriptionLength;
+					return DeviceDescription;
+				
+				case _DeviceTypeVersion:
+					*size = TypeVersionLength;
+					return DeviceTypeVersion;
+        
+				default:
+					return NULL;
     }
 }
 
