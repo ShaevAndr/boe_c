@@ -119,6 +119,8 @@
 		ipNumberOfApplicationLaunches,
 		ipNumberErrorWriteDeviceUsStat,
 
+		_IP_ProtocolMode,
+
 		_IPCount
 	} IntParam_t;
 	//--------------------------------------------------------------------------//

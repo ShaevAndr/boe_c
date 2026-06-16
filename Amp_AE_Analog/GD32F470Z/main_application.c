@@ -30,6 +30,7 @@
 #include "drv_PowerSync.h"
 #include "DeviceUsageStatistics.h"
 #include "DeviceTemperatureStatistics.h"
+#include "ModbusRtuRoutine.h"
 //--------------------------------------------------------------------------//
 TMTDDevice SPmtdDev;
 //--------------------------------------------------------------------------//
@@ -72,8 +73,17 @@ int main (void)
   LoadParamApp (&main_storage);
   loadLockUnlockStatus();
   CommandParserInit();
-  
-  PacketParser_Init ();
+	
+	gParamApp.ProtocolMode = 1;
+
+  if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
+  {
+    ModbusRtuRoutine_Init();
+  }
+  else
+  {
+    PacketParser_Init();
+  }
     
   InitMonADC0 ();
   InitMonADC1 ();
@@ -113,7 +123,11 @@ int main (void)
 			}
 		}
 		
-    Unicorn2Routine ();//Unicorn2
+    if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
+      ModbusRtuRoutine();
+    else
+      Unicorn2Routine();
+		
     RoutineMonADC0 ();
     RoutineMonADC1 ();
     RoutineMonADC2 ();
