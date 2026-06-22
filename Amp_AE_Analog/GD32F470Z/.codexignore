@@ -1,0 +1,34 @@
+# Build artifacts
+Objects/
+Listings/
+*.map
+*.lst
+*.axf
+*.hex
+*.o
+*.d
+
+# Keil / IDE session state
+*.uvguix.*
+*.uvoptx
+
+# Bootloader is out of active development scope for this workspace
+BootLoader/
+
+# Debugger and runtime logs
+JLinkLog.txt
+JLinkSettings.ini
+EventRecorderStub.scvd
+
+# Generated RTE target metadata
+RTE/_Target_1/
+
+# Vendor backup/update snapshots from packs
+RTE/Device/GD32F470ZI/*.base@*
+RTE/Device/GD32F470ZI/*.update@*
+
+# Third-party reference docs not needed for most code tasks
+LittleFS/DESIGN.md
+LittleFS/LICENSE.md
+LittleFS/README.md
+LittleFS/SPEC.md

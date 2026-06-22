@@ -8,7 +8,7 @@
 ============================================================================*/
 #include <string.h>
 #include "ReadFileRecord.h"
-#include "../Unicorn2/CommandParser.h"
+#include "../deviceInfo/deviceDescription.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2)
@@ -20,24 +20,22 @@
 #define CHUNK_SIZE      245
 #define FILE_REF_TYPE   6
 
-static const char* GetFileData(uint16_t fileNumber, uint32_t *size){
+static const char *GetFileData(uint16_t fileNumber, uint32_t *size)
+{
     switch(fileNumber)
     {
-        case _DeviceDescription:
-					*size = descriptionLength;
-					return DeviceDescription;
-				
-				case _DeviceTypeVersion:
-					*size = TypeVersionLength;
-					return DeviceTypeVersion;
-        
-				default:
-					return NULL;
+		case _DeviceDescription:
+			*size = descriptionLength;
+			return DeviceDescription;
+
+		default:
+			return NULL;
     }
 }
 
 uint8_t ReadFileRecord(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSize)
 {
+	(void)NumUART;
 	uint16_t fileNumber = (uint16_t)(B[3] << 8) | B[4];
 	uint16_t recordNumber  = (uint16_t)(B[5] << 8) | B[6];
 

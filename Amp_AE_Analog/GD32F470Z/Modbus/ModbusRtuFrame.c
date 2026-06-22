@@ -49,8 +49,9 @@ void ModbusRtuFrame_Process(uint8_t NumUART, uint8_t *Buff, uint32_t *pSize, uin
 	uint8_t *pdu = &Buff[1];
 	uint32_t pduSize = frameSize - 3;
 
-	// Minimum PDU is 5 bytes (FC + 2 addr + 2 data) for most commands
-	if (pduSize < 5)
+	// A PDU always contains at least the function code. Command-specific
+	// request sizes are validated by ModbusCommandProcess().
+	if (pduSize < 1)
 	{
 		*pSize = 0;
 		return;
@@ -82,7 +83,7 @@ void ModbusRtuFrame_Process(uint8_t NumUART, uint8_t *Buff, uint32_t *pSize, uin
 	// Normal response: [Addr][ResponsePDU][CRC]
 	Buff[0] = deviceAddress;
 	// ResponsePDU already at Buff[1], length = pduSize
-	uint16_t crc = calculate_modbus_crc(Buff, 1 + pduSize);
+	uint16_t crc = CRC16(Buff, 1 + pduSize);
 	Buff[1 + pduSize]     = (uint8_t)(crc & 0xFF);
 	Buff[1 + pduSize + 1] = (uint8_t)(crc >> 8);
 	*pSize = 1 + pduSize + 2;

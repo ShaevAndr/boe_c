@@ -29,7 +29,7 @@
 #include "unicorn_uart_speed.h"
 #include "CommandParser.h"
 //--------------------------------------------------------------------------//
-static char UnitDescriptionBuf [128];
+static char UnitDescriptionBuf [UNIT_DESCRIPTION_BUFFER_SIZE];
 const char *UnitDescription = UnitDescriptionBuf;
 const uint8_t buildDate [] = __DATE__;
 const uint8_t buildTime [] = __TIME__;

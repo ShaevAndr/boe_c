@@ -1,23 +1,17 @@
 /*=============================================================================
      Project:
      Platform: GD32F470
-     Filename: ReadFileRecord.h
-     Description: FC 0x14 - Read File Record
+     Filename: ReadDeviceIdentification.h
+     Description: FC 0x08 - Read Device Identification
      Version: 1.0
-     Created: 2026.06.05
+     Created: 2026.06.22
 ============================================================================*/
-#ifndef READ_FILE_RECORD_H
-#define READ_FILE_RECORD_H
+#ifndef READ_DEVICE_IDENTIFICATION_H
+#define READ_DEVICE_IDENTIFICATION_H
 
 #include <stdint.h>
 
-typedef enum
-{
-	_DeviceDescription = 1,
-	_ModbusFileCounts
-} modbusFiles;
-
-uint8_t ReadFileRecord(
+uint8_t ReadDeviceIdentification(
 	uint8_t NumUART,
 	uint8_t Command,
 	uint8_t *B,

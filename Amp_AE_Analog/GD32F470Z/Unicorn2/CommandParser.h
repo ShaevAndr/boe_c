@@ -15,6 +15,7 @@
 	//------------------------------------------------------------------------------
 	#define _TypeDev (0x0320)
 	#define _VerDev (0x0100)
+	#define UNIT_DESCRIPTION_BUFFER_SIZE (128U)
 
 	extern const char *UnitDescription;
 	extern const uint8_t buildDate [];

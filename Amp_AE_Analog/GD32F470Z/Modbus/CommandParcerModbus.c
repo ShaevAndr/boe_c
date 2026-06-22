@@ -13,6 +13,7 @@
 #include "ReadInputRegisters.h"
 #include "WriteSingleRegister.h"
 #include "WriteMultipleRegisters.h"
+#include "ReadDeviceIdentification.h"
 #include "ReadFileRecord.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
@@ -21,6 +22,7 @@
 // Variable-length payload (FC 0x10) is additionally validated by the handler.
 #define MIN_PDU_READ                  5  // FC + StartAddr(2) + Qty(2)
 #define MIN_PDU_WRITE_SINGLE          7  // FC + RegAddr(2) + Value(4)
+#define PDU_READ_DEVICE_IDENTIFICATION 1  // FC only
 #define MIN_PDU_WRITE_MULTIPLE_HDR   10  // FC + StartAddr(2) + Qty(2) + BC(1) + Data(>=4)
 #define MIN_PDU_READ_FILE_RECORD 			9	 // FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2)
 //--------------------------------------------------------------------------//
@@ -42,6 +44,10 @@ uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 		case _WriteSingleRegister:
 			if (reqSize < MIN_PDU_WRITE_SINGLE) return _IllegalDataValue;
 			return WriteSingleRegister(NumUART, Command, Buff, pSize);
+
+		case _ReadDeviceIdentification:
+			if (reqSize != PDU_READ_DEVICE_IDENTIFICATION) return _IllegalDataValue;
+			return ReadDeviceIdentification(NumUART, Command, Buff, pSize);
 
 		case _WriteMultipleRegisters:
 			if (reqSize < MIN_PDU_WRITE_MULTIPLE_HDR) return _IllegalDataValue;

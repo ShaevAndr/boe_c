@@ -22,6 +22,21 @@
 Ответ:   [01][04][04][P_B3][P_B2][P_B1][P_B0][CRC_L][CRC_H]              = 9 байт
 ```
 
+### FC 0x08 — Read Device Identification
+
+Проектная функция чтения идентификации устройства. Запрос не содержит данных помимо кода функции.
+
+```
+Запрос (4 байта): [Addr][08][CRC_L][CRC_H]
+Ответ:             [Addr][08][BC][Type_H][Type_L][Ver_H][Ver_L][ShortDescription...][CRC_L][CRC_H]
+```
+
+- `BC = 4 + длина ShortDescription`
+- `Type` — `_TypeDev`, 16-bit big-endian
+- `Ver` — `_VerDev`, 16-bit big-endian
+- `ShortDescription` — фактический `UnitDescription` без завершающего `\0`
+- весь ответ обязан поместиться в один RTU-кадр размером до 256 байт; иначе возвращается exception `_IllegalDataValue` (`0x03`)
+
 ### FC 0x06 — Write Single Register / Parameter
 
 ```
@@ -83,7 +98,9 @@ State machine с захватом таймстампов байтов в IRQ (Ti
 | `0x03` | 5       | `ReadHoldingsRegisters()`  | `ReadHoldingRegisters.c`    |
 | `0x04` | 5       | `ReadInputRegisters()`     | `ReadInputRegisters.c`      |
 | `0x06` | 7       | `WriteSingleRegister()`    | `WriteSingleRegister.c`     |
+| `0x08` | 1       | `ReadDeviceIdentification()` | `ReadDeviceIdentification.c` |
 | `0x10` | 10      | `WriteMultipleRegisters()` | `WriteMultipleRegisters.c`  |
+| `0x14` | 9       | `ReadFileRecord()`         | `ReadFilerecord.c`          |
 | другой | —       | -> `_IllegalFunction`      |                             |
 
 ### 4. Маппинг адресов в параметры
@@ -132,6 +149,8 @@ CommandParcerModbus.c       <- проверка min PDU + switch по FC
     |---> ReadHoldingRegisters.c  --> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |---> ReadInputRegisters.c    --> ModbusUtils.c --> AccessTelemParam
     |---> WriteSingleRegister.c   --> ModbusUtils.c --> AccessIntParam / AccessFloatParam
+    |---> ReadDeviceIdentification.c --> type + version + UnitDescription
+    |---> ReadFilerecord.c --> full device description, file 1
     +---> WriteMultipleRegisters.c -> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |
     v                              ErrorHandler.c <- Unicorn -> Modbus exception
