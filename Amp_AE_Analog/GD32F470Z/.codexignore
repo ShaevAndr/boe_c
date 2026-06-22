@@ -32,3 +32,6 @@ LittleFS/DESIGN.md
 LittleFS/LICENSE.md
 LittleFS/README.md
 LittleFS/SPEC.md
+
+# Modbus specification: keep out of automatic context; read explicitly when protocol details are needed
+Modbus_Application_Protocol_V1_1b3-2.pdf

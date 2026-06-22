@@ -1,7 +1,7 @@
 /*=============================================================================
      Project:
      Platform: GD32F470
-     Filename: ReadFileRegistr.c
+     Filename: ReadFileRecord.c
      Description: FC 0x14 - Read File Record.
      Version: 2.0
      Created: 2026.06.05

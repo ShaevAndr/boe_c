@@ -15,10 +15,24 @@
 - `Modbus/WriteSingleRegister.c`
 - `Modbus/WriteMultipleRegisters.c`
 - `Modbus/ReadDeviceIdentification.c`
-- `Modbus/ReadFilerecord.c`
+- `Modbus/ReadFileRecord.c`
 - `Unicorn2/AccessIntParam.c`
 - `Unicorn2/AccessFloatParam.c`
 - `Unicorn2/AccessTelemParam.c`
+
+## Normative source
+
+Для форматов и правил Modbus использовать `Modbus_Application_Protocol_V1_1b3-2.pdf`.
+Для Read Device Identification нормативный раздел — 6.21.
+
+Объекты Read Device Identification:
+
+- `0x00` VendorName = `DEVICE_VENDOR_NAME`;
+- `0x01` ProductCode = `_TypeDev` как ASCII `0xXXXX`;
+- `0x02` MajorMinorRevision = `_VerDev` как ASCII `major.minor`;
+- `0x04` ProductName = `UnitDescription`.
+
+Реализация использует conformity `0x82` и не сегментирует ответ: весь набор должен поместиться в один PDU.
 
 ## Current protocol model
 
@@ -39,7 +53,7 @@
 - `0x03` -> `ReadHoldingsRegisters()`
 - `0x04` -> `ReadInputRegisters()`
 - `0x06` -> `WriteSingleRegister()`
-- `0x08` -> `ReadDeviceIdentification()`; type, version and short runtime description in one response
+- `0x2B/0x0E` -> `ReadDeviceIdentification()`; standard Basic/Regular identification objects in one response
 - `0x10` -> `WriteMultipleRegisters()`
 - `0x14` -> `ReadFileRecord()`; file 1 contains the full device description
 

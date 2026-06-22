@@ -1,6 +1,6 @@
 # Modbus RTU - Поток обработки данных
 
-> **Внимание**: формат — кастомный, не стандартный Modbus. Один "register address" в запросе соответствует одному **4-байтному параметру**. Поле ByteCount — 1-байтное (как в стандартном Modbus), но данные — 4 байта на параметр.
+> **Внимание**: mapping регистров для FC 0x03/0x04/0x06/0x10 — проектный. Один "register address" в запросе соответствует одному **4-байтному параметру**. Поле ByteCount — 1-байтное (как в стандартном Modbus), но данные — 4 байта на параметр.
 
 ## Формат кадров
 
@@ -22,20 +22,30 @@
 Ответ:   [01][04][04][P_B3][P_B2][P_B1][P_B0][CRC_L][CRC_H]              = 9 байт
 ```
 
-### FC 0x08 — Read Device Identification
+### FC 0x2B / MEI 0x0E — Read Device Identification
 
-Проектная функция чтения идентификации устройства. Запрос не содержит данных помимо кода функции.
+Стандартная функция из `Modbus_Application_Protocol_V1_1b3-2.pdf`, раздел 6.21.
 
 ```
-Запрос (4 байта): [Addr][08][CRC_L][CRC_H]
-Ответ:             [Addr][08][BC][Type_H][Type_L][Ver_H][Ver_L][ShortDescription...][CRC_L][CRC_H]
+Запрос (7 байт): [Addr][2B][0E][ReadDevIdCode][ObjectId][CRC_L][CRC_H]
+Ответ: [Addr][2B][0E][ReadDevIdCode][Conformity][MoreFollows][NextObjectId][ObjectCount]
+       [ObjectId][Length][ASCII Value] ... [CRC_L][CRC_H]
 ```
 
-- `BC = 4 + длина ShortDescription`
-- `Type` — `_TypeDev`, 16-bit big-endian
-- `Ver` — `_VerDev`, 16-bit big-endian
-- `ShortDescription` — фактический `UnitDescription` без завершающего `\0`
-- весь ответ обязан поместиться в один RTU-кадр размером до 256 байт; иначе возвращается exception `_IllegalDataValue` (`0x03`)
+Поддерживаемые объекты:
+
+| Object ID | Поле | Значение |
+|-----------|------|----------|
+| `0x00` | VendorName | `Unicorn` |
+| `0x01` | ProductCode | тип устройства `_TypeDev` в виде `0x0320` |
+| `0x02` | MajorMinorRevision | версия `_VerDev` в виде `1.0` |
+| `0x04` | ProductName | фактический `UnitDescription` |
+
+- conformity level: `0x82` — Regular identification, stream и individual access
+- `ReadDevIdCode 0x01` возвращает Basic objects `0x00..0x02`
+- `ReadDevIdCode 0x02` и `0x03` возвращают доступный Regular-набор, включая `0x04`
+- `ReadDevIdCode 0x04` возвращает один запрошенный объект
+- все запрошенные объекты должны поместиться в один PDU до 253 байт; сегментация не используется, при переполнении возвращается `_IllegalDataValue` (`0x03`)
 
 ### FC 0x06 — Write Single Register / Parameter
 
@@ -98,9 +108,9 @@ State machine с захватом таймстампов байтов в IRQ (Ti
 | `0x03` | 5       | `ReadHoldingsRegisters()`  | `ReadHoldingRegisters.c`    |
 | `0x04` | 5       | `ReadInputRegisters()`     | `ReadInputRegisters.c`      |
 | `0x06` | 7       | `WriteSingleRegister()`    | `WriteSingleRegister.c`     |
-| `0x08` | 1       | `ReadDeviceIdentification()` | `ReadDeviceIdentification.c` |
+| `0x2B/0x0E` | 4 | `ReadDeviceIdentification()` | `ReadDeviceIdentification.c` |
 | `0x10` | 10      | `WriteMultipleRegisters()` | `WriteMultipleRegisters.c`  |
-| `0x14` | 9       | `ReadFileRecord()`         | `ReadFilerecord.c`          |
+| `0x14` | 9       | `ReadFileRecord()`         | `ReadFileRecord.c`          |
 | другой | —       | -> `_IllegalFunction`      |                             |
 
 ### 4. Маппинг адресов в параметры
@@ -149,8 +159,8 @@ CommandParcerModbus.c       <- проверка min PDU + switch по FC
     |---> ReadHoldingRegisters.c  --> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |---> ReadInputRegisters.c    --> ModbusUtils.c --> AccessTelemParam
     |---> WriteSingleRegister.c   --> ModbusUtils.c --> AccessIntParam / AccessFloatParam
-    |---> ReadDeviceIdentification.c --> type + version + UnitDescription
-    |---> ReadFilerecord.c --> full device description, file 1
+    |---> ReadDeviceIdentification.c --> standard identification objects
+    |---> ReadFileRecord.c --> full device description, file 1
     +---> WriteMultipleRegisters.c -> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |
     v                              ErrorHandler.c <- Unicorn -> Modbus exception
