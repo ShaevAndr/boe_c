@@ -195,3 +195,14 @@ Input register space:
 - bootloader не участвует;
 - Unicorn2 интересует только как backend параметров;
 - основной слой изменений и диагностики — `Modbus/` + связанные `Access*Param`.
+
+## Tests
+
+После изменений Modbus запускать:
+
+```sh
+./tests/modbus/run_tests.sh
+make -C tests/modbus sanitize
+```
+
+Тесты используют реальные обработчики `Modbus/*.c` и host-side заглушки `Access*Param`.

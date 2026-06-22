@@ -180,3 +180,14 @@ RS485 UART TX
 - `1` = Modbus RTU
 
 Переключение вступает в силу после перезагрузки устройства.
+
+## Host-side тесты
+
+Тесты активных Modbus-функций находятся в `tests/modbus`.
+
+```sh
+./tests/modbus/run_tests.sh
+make -C tests/modbus sanitize
+```
+
+Они компилируют реальные файлы `Modbus/*.c` с тестовыми заглушками backend-параметров.
