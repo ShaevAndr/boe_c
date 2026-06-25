@@ -2,6 +2,8 @@
 
 > **Внимание**: mapping регистров для FC 0x03/0x04/0x06/0x10 — проектный. Один "register address" в запросе соответствует одному **4-байтному параметру**. Поле ByteCount — 1-байтное (как в стандартном Modbus), но данные — 4 байта на параметр.
 
+Внешний контракт для программы Modbus-master описан в `Modbus/MASTER_PROTOCOL.md`.
+
 ## Формат кадров
 
 ### FC 0x03 / 0x04 — Read Holding / Read Input Registers
