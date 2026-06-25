@@ -16,6 +16,9 @@ SOURCES := \
 	../../Modbus/WriteSingleRegister.c \
 	../../Modbus/WriteMultipleRegisters.c \
 	../../Modbus/ReadFileRecord.c \
+	../../Modbus/WriteFileRecord.c \
+	../../Modbus/Diagnostics.c \
+	../../Modbus/TabParamFiles.c \
 	../../Modbus/ReadDeviceIdentification.c \
 	../../Modbus/CommandParcerModbus.c \
 	../../Modbus/ModbusRtuFrame.c \

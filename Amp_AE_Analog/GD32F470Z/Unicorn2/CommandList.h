@@ -222,6 +222,8 @@
 	typedef enum {
 		_TabPUnknown		= -1,
 
+		_TabTestTable,
+
 		_TabPCount
 	} TabParams;
 	//--------------------------------------------------------------------------//

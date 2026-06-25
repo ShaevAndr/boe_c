@@ -15,6 +15,8 @@
 #include "WriteMultipleRegisters.h"
 #include "ReadDeviceIdentification.h"
 #include "ReadFileRecord.h"
+#include "WriteFileRecord.h"
+#include "Diagnostics.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
 //--------------------------------------------------------------------------//
@@ -25,6 +27,8 @@
 #define PDU_READ_DEVICE_IDENTIFICATION 4  // FC + MEI + ReadDevId + ObjectId
 #define MIN_PDU_WRITE_MULTIPLE_HDR   10  // FC + StartAddr(2) + Qty(2) + BC(1) + Data(>=4)
 #define MIN_PDU_READ_FILE_RECORD 			9	 // FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2)
+#define MIN_PDU_WRITE_FILE_RECORD 		9	 // FC + ByteCount + RefType + FileNumber(2) + RecordNumber(2) + RecordLength(2) + Data
+#define MIN_PDU_DIAGNOSTICS          3  // FC + SubFunction(2)
 //--------------------------------------------------------------------------//
 uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 {
@@ -45,6 +49,10 @@ uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 			if (reqSize < MIN_PDU_WRITE_SINGLE) return _IllegalDataValue;
 			return WriteSingleRegister(NumUART, Command, Buff, pSize);
 
+		case _Diagnostics:
+			if (reqSize < MIN_PDU_DIAGNOSTICS) return _IllegalDataValue;
+			return Diagnostics(NumUART, Command, Buff, pSize);
+
 		case _EncapsulatedInterfaceTransport:
 			if (reqSize != PDU_READ_DEVICE_IDENTIFICATION) return _IllegalDataValue;
 			return ReadDeviceIdentification(NumUART, Command, Buff, pSize);
@@ -56,6 +64,10 @@ uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 		case _ReadFileRecord:
 			if (reqSize < MIN_PDU_READ_FILE_RECORD) return _IllegalDataValue;
 			return ReadFileRecord(NumUART, Command, Buff, pSize);
+
+		case _WriteFileRecord:
+			if (reqSize < MIN_PDU_WRITE_FILE_RECORD) return _IllegalDataValue;
+			return WriteFileRecord(NumUART, Command, Buff, pSize);
 		
 		default:
 			return _IllegalFunction;

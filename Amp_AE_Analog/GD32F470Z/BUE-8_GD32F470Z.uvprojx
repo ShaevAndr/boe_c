@@ -654,6 +654,16 @@
               <FilePath>.\Unicorn2\AccessTelemParam.h</FilePath>
             </File>
             <File>
+              <FileName>AccessTabParam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Unicorn2\AccessTabParam.c</FilePath>
+            </File>
+            <File>
+              <FileName>AccessTabParam.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Unicorn2\AccessTabParam.h</FilePath>
+            </File>
+            <File>
               <FileName>CommandParser.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Unicorn2\CommandParser.c</FilePath>
@@ -1063,6 +1073,36 @@
               <FileName>ReadFileRecord.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Modbus\ReadFileRecord.c</FilePath>
+            </File>
+            <File>
+              <FileName>WriteFileRecord.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\WriteFileRecord.h</FilePath>
+            </File>
+            <File>
+              <FileName>WriteFileRecord.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\WriteFileRecord.c</FilePath>
+            </File>
+            <File>
+              <FileName>Diagnostics.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\Diagnostics.h</FilePath>
+            </File>
+            <File>
+              <FileName>Diagnostics.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\Diagnostics.c</FilePath>
+            </File>
+            <File>
+              <FileName>TabParamFiles.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Modbus\TabParamFiles.h</FilePath>
+            </File>
+            <File>
+              <FileName>TabParamFiles.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\TabParamFiles.c</FilePath>
             </File>
             <File>
               <FileName>ReadDeviceIdentification.h</FileName>

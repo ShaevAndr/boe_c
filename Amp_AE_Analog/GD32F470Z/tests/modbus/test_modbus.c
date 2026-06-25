@@ -3,11 +3,14 @@
 #include <string.h>
 
 #include "../../Modbus/CommandParcerModbus.h"
+#include "../../Modbus/Diagnostics.h"
 #include "../../Modbus/ErrorHandler.h"
 #include "../../Modbus/ModbusRtuFrame.h"
 #include "../../Modbus/ModbusUtils.h"
 #include "../../Modbus/ReadDeviceIdentification.h"
 #include "../../Modbus/ReadFileRecord.h"
+#include "../../Modbus/TabParamFiles.h"
+#include "../../Modbus/WriteFileRecord.h"
 #include "../../Modbus/ReadHoldingRegisters.h"
 #include "../../Modbus/ReadInputRegisters.h"
 #include "../../Modbus/WriteMultipleRegisters.h"
@@ -459,6 +462,128 @@ static int TestReadFileRecord(void)
 	return 1;
 }
 
+static int TestTableFileRecords(void)
+{
+	uint8_t pdu[32] = {0x14U, 7U, 6U, 0U, MODBUS_TABLE_TEST_FILE, 0U, 0U, 0U, 4U};
+	uint32_t size = 9U;
+
+	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
+	CHECK_EQ_U32(12U, size);
+	CHECK_EQ_U32(10U, pdu[1]);
+	CHECK_EQ_U32(9U, pdu[2]);
+	CHECK_EQ_U32(6U, pdu[3]);
+	CHECK_EQ_U32(0x10U, pdu[4]);
+	CHECK_EQ_U32(0x11U, pdu[5]);
+	CHECK_EQ_U32(0x12U, pdu[6]);
+	CHECK_EQ_U32(0x13U, pdu[7]);
+
+	pdu[0] = 0x15U;
+	pdu[1] = 11U;
+	pdu[2] = 6U;
+	pdu[3] = 0U;
+	pdu[4] = MODBUS_TABLE_TEST_FILE;
+	pdu[5] = 0U;
+	pdu[6] = 2U;
+	pdu[7] = 0U;
+	pdu[8] = 2U;
+	pdu[9] = 0xAAU;
+	pdu[10] = 0xBBU;
+	pdu[11] = 0xCCU;
+	pdu[12] = 0xDDU;
+	size = 13U;
+	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
+	CHECK_EQ_U32(13U, size);
+
+	pdu[0] = 0x14U;
+	pdu[1] = 7U;
+	pdu[2] = 6U;
+	pdu[3] = 0U;
+	pdu[4] = MODBUS_TABLE_TEST_FILE;
+	pdu[5] = 0U;
+	pdu[6] = 2U;
+	pdu[7] = 0U;
+	pdu[8] = 2U;
+	size = 9U;
+	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
+	CHECK_EQ_U32(8U, size);
+	CHECK_EQ_U32(0xAAU, pdu[4]);
+	CHECK_EQ_U32(0xBBU, pdu[5]);
+	CHECK_EQ_U32(0xCCU, pdu[6]);
+	CHECK_EQ_U32(0xDDU, pdu[7]);
+
+	pdu[0] = 0x15U;
+	pdu[1] = 9U;
+	pdu[2] = 6U;
+	pdu[3] = 0U;
+	pdu[4] = 0xFFU;
+	pdu[5] = 0U;
+	pdu[6] = 0U;
+	pdu[7] = 0U;
+	pdu[8] = 1U;
+	pdu[9] = 0U;
+	pdu[10] = 0U;
+	size = 11U;
+	CHECK_EQ_U32(_IllegalDataAddress, WriteFileRecord(0U, 0x15U, pdu, &size));
+	return 1;
+}
+
+static int TestDiagnosticsTableFunctions(void)
+{
+	uint8_t pdu[128] = {0x08U, 0U, MODBUS_DIAG_TABLE_COUNT};
+	uint32_t size = 3U;
+	const char expectedDescription[] = "Test table parameter; file=100; bytes=16";
+
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(7U, size);
+	CHECK_EQ_U32(1U, GetU32Be(&pdu[3]));
+
+	pdu[0] = 0x08U;
+	pdu[1] = 0U;
+	pdu[2] = MODBUS_DIAG_TABLE_DESCRIPTION;
+	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+	size = 7U;
+	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
+	CHECK_EQ_U32(11U + strlen(expectedDescription), size);
+	CHECK_EQ_U32(MODBUS_TABLE_TEST_INDEX, GetU32Be(&pdu[3]));
+	CHECK_EQ_U32(strlen(expectedDescription), GetU32Be(&pdu[7]));
+	CHECK(memcmp(&pdu[11], expectedDescription, strlen(expectedDescription)) == 0);
+
+	pdu[0] = 0x08U;
+	pdu[1] = 0U;
+	pdu[2] = MODBUS_DIAG_TABLE_PREPARE;
+	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+	PutU32Be(&pdu[7], 3U);
+	size = 11U;
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(11U, size);
+	CHECK_EQ_U32(3U, GetU32Be(&pdu[7]));
+
+	pdu[0] = 0x08U;
+	pdu[1] = 0U;
+	pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
+	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+	size = 7U;
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(23U, size);
+	CHECK_EQ_U32(1U, GetU32Be(&pdu[7]));
+	CHECK_EQ_U32(1U, GetU32Be(&pdu[11]));
+	CHECK_EQ_U32(4U, GetU32Be(&pdu[15]));
+	CHECK_EQ_U32(4U, GetU32Be(&pdu[19]));
+
+	pdu[0] = 0x08U;
+	pdu[1] = 0U;
+	pdu[2] = MODBUS_DIAG_TABLE_RELEASE;
+	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+	size = 7U;
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(7U, size);
+
+	PutU32Be(&pdu[3], 0x12345678UL);
+	size = 7U;
+	CHECK_EQ_U32(_IllegalDataAddress, Diagnostics(0U, 0x08U, pdu, &size));
+	return 1;
+}
+
 static int TestReadDeviceIdentificationRegular(void)
 {
 	uint8_t pdu[256] = {0x2BU, 0x0EU, 0x02U, 0x00U};
@@ -624,6 +749,8 @@ int main(void)
 	RUN_TEST(TestWriteMultipleAcrossTypeBoundary);
 	RUN_TEST(TestWriteMultipleValidation);
 	RUN_TEST(TestReadFileRecord);
+	RUN_TEST(TestTableFileRecords);
+	RUN_TEST(TestDiagnosticsTableFunctions);
 	RUN_TEST(TestReadDeviceIdentificationRegular);
 	RUN_TEST(TestReadDeviceIdentificationModesAndErrors);
 	RUN_TEST(TestCommandDispatcher);

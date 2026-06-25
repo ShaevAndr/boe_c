@@ -37,10 +37,12 @@
 	#define _ReadInputRegisters     0x04
 	#define _WriteSingleCoil        0x05
 	#define _WriteSingleRegister    0x06
+	#define _Diagnostics            0x08
 	#define _EncapsulatedInterfaceTransport 0x2B
 	#define _WriteMultipleCoils     0x0F
 	#define _WriteMultipleRegisters 0x10
 	#define _ReadFileRecord					0x14
+	#define _WriteFileRecord        0x15
 
 	//------------------------------------------------------------------------------
 	uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize);
