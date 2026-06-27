@@ -110,9 +110,11 @@ State machine с захватом таймстампов байтов в IRQ (Ti
 | `0x03` | 5       | `ReadHoldingsRegisters()`  | `ReadHoldingRegisters.c`    |
 | `0x04` | 5       | `ReadInputRegisters()`     | `ReadInputRegisters.c`      |
 | `0x06` | 7       | `WriteSingleRegister()`    | `WriteSingleRegister.c`     |
+| `0x08` | 3       | `Diagnostics()`            | `Diagnostics.c`             |
 | `0x2B/0x0E` | 4 | `ReadDeviceIdentification()` | `ReadDeviceIdentification.c` |
 | `0x10` | 10      | `WriteMultipleRegisters()` | `WriteMultipleRegisters.c`  |
 | `0x14` | 9       | `ReadFileRecord()`         | `ReadFileRecord.c`          |
+| `0x15` | 9       | `WriteFileRecord()`        | `WriteFileRecord.c`         |
 | другой | —       | -> `_IllegalFunction`      |                             |
 
 ### 4. Маппинг адресов в параметры
@@ -124,8 +126,11 @@ State machine с захватом таймстампов байтов в IRQ (Ti
 **`../Unicorn2/AccessIntParam.c`** -> `AccessIntParam(IntParam_t, int32_t *, _PAM_RO/_PAM_WO)`
 **`../Unicorn2/AccessFloatParam.c`** -> `AccessFloatParam(FloatParam_t, float *, _PAM_RO/_PAM_WO)`
 **`../Unicorn2/AccessTelemParam.c`** -> `AccessTelemParam(TelimParam_t, float *)`
+**`../Unicorn2/AccessTabParam.c`** -> все операции с табличными параметрами (`GetCountTabParam`, `ReadDescrTabParam`, `ReadTabParam`, `WriteTabParam`, подготовка и освобождение)
 
-Все типы — 4-байтные.
+Для FC `0x14/0x15` номер файла `100 + N` преобразуется в индекс табличного параметра `N`. `RecordNumber` задаёт смещение `RecordNumber * 2`. При чтении `RecordLength` игнорируется: в `AccessTabParam` передаются максимально допустимые `size = 249`, `wordSize = 2`, `stride = 2`, а backend возвращает фактический размер вплоть до нуля на EOF. При записи размер остаётся `RecordLength * 2`, `stride = 2`. Дополнительный CRC табличных данных не используется — весь RTU-кадр уже защищён Modbus CRC.
+
+INT, FLOAT и TELEMETRY — 4-байтные; табличные параметры передаются байтовыми блоками.
 
 ### 6. Конвертация ошибок
 **`ErrorHandler.c`** -> `ConvertUnicornErrorIntoModbusError()`
@@ -162,7 +167,9 @@ CommandParcerModbus.c       <- проверка min PDU + switch по FC
     |---> ReadInputRegisters.c    --> ModbusUtils.c --> AccessTelemParam
     |---> WriteSingleRegister.c   --> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |---> ReadDeviceIdentification.c --> standard identification objects
-    |---> ReadFileRecord.c --> full device description, file 1
+    |---> ReadFileRecord.c --> device description (file 1) / AccessTabParam (files 100...)
+    |---> WriteFileRecord.c --> AccessTabParam
+    |---> Diagnostics.c --> AccessTabParam
     +---> WriteMultipleRegisters.c -> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |
     v                              ErrorHandler.c <- Unicorn -> Modbus exception

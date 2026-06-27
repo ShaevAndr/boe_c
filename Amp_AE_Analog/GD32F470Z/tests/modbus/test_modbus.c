@@ -9,7 +9,6 @@
 #include "../../Modbus/ModbusUtils.h"
 #include "../../Modbus/ReadDeviceIdentification.h"
 #include "../../Modbus/ReadFileRecord.h"
-#include "../../Modbus/TabParamFiles.h"
 #include "../../Modbus/WriteFileRecord.h"
 #include "../../Modbus/ReadHoldingRegisters.h"
 #include "../../Modbus/ReadInputRegisters.h"
@@ -17,11 +16,14 @@
 #include "../../Modbus/WriteSingleRegister.h"
 #include "../../Unicorn2/AccessFloatParam.h"
 #include "../../Unicorn2/AccessIntParam.h"
+#include "../../Unicorn2/AccessTabParam.h"
 #include "../../Unicorn2/AccessTelemParam.h"
 #include "../../Unicorn2/crc16.h"
 #include "../../deviceInfo/deviceDescription.h"
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+#define MODBUS_TABLE_TEST_FILE (MODBUS_TABLE_FILE_BASE + _TabTestTable)
+#define MODBUS_TABLE_TEST_INDEX _TabTestTable
 
 static unsigned testsRun;
 static unsigned testsFailed;
@@ -446,36 +448,67 @@ static int TestReadFileRecord(void)
 	CHECK_EQ_U32(6U, pdu[3]);
 	CHECK(memcmp(&pdu[4], DeviceDescription, expectedLength) == 0);
 
-	pdu[3] = 0U;
+	memset(pdu, 0, 9U);
+	pdu[0] = 0x14U;
+	pdu[1] = 7U;
+	pdu[2] = 6U;
 	pdu[4] = 2U;
+	pdu[8] = 1U;
 	size = 9U;
 	CHECK_EQ_U32(_IllegalDataAddress, ReadFileRecord(0U, 0x14U, pdu, &size));
 
-	pdu[3] = 0U;
+	memset(pdu, 0, 9U);
+	pdu[0] = 0x14U;
+	pdu[1] = 7U;
+	pdu[2] = 6U;
 	pdu[4] = 1U;
-	pdu[5] = 0U;
 	pdu[6] = 1U;
+	pdu[8] = 1U;
 	size = 9U;
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
 	CHECK_EQ_U32(4U, size);
 	CHECK_EQ_U32(2U, pdu[1]);
+
+	memset(pdu, 0, 9U);
+	pdu[0] = 0x14U;
+	pdu[1] = 6U;
+	pdu[2] = 6U;
+	pdu[4] = 1U;
+	pdu[8] = 1U;
+	size = 9U;
+	CHECK_EQ_U32(_IllegalDataValue, ReadFileRecord(0U, 0x14U, pdu, &size));
+
+	pdu[1] = 7U;
+	pdu[2] = 5U;
+	CHECK_EQ_U32(_IllegalDataValue, ReadFileRecord(0U, 0x14U, pdu, &size));
+
+	pdu[2] = 6U;
+	size = 10U;
+	CHECK_EQ_U32(_IllegalDataValue, ReadFileRecord(0U, 0x14U, pdu, &size));
+
+	size = 9U;
+	pdu[8] = 0U;
+	CHECK_EQ_U32(_IllegalDataValue, ReadFileRecord(0U, 0x14U, pdu, &size));
 	return 1;
 }
 
 static int TestTableFileRecords(void)
 {
-	uint8_t pdu[32] = {0x14U, 7U, 6U, 0U, MODBUS_TABLE_TEST_FILE, 0U, 0U, 0U, 4U};
+	uint8_t pdu[256] = {0x14U, 7U, 6U, 0U, MODBUS_TABLE_TEST_FILE, 0U, 0U, 0U, 4U};
 	uint32_t size = 9U;
+	uint8_t directData[4];
+	uint32_t directSize;
 
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
-	CHECK_EQ_U32(12U, size);
-	CHECK_EQ_U32(10U, pdu[1]);
-	CHECK_EQ_U32(9U, pdu[2]);
+	CHECK_EQ_U32(20U, size);
+	CHECK_EQ_U32(18U, pdu[1]);
+	CHECK_EQ_U32(17U, pdu[2]);
 	CHECK_EQ_U32(6U, pdu[3]);
 	CHECK_EQ_U32(0x10U, pdu[4]);
 	CHECK_EQ_U32(0x11U, pdu[5]);
 	CHECK_EQ_U32(0x12U, pdu[6]);
 	CHECK_EQ_U32(0x13U, pdu[7]);
+	CHECK_EQ_U32(0x43U, pdu[19]);
 
 	pdu[0] = 0x15U;
 	pdu[1] = 11U;
@@ -494,6 +527,15 @@ static int TestTableFileRecords(void)
 	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
 	CHECK_EQ_U32(13U, size);
 
+	directSize = sizeof(directData);
+	CHECK_EQ_U32(_NoError, ReadTabParam(0U, _TabTestTable, directData,
+		4U, 2U, 2U, &directSize));
+	CHECK_EQ_U32(sizeof(directData), directSize);
+	CHECK_EQ_U32(0xAAU, directData[0]);
+	CHECK_EQ_U32(0xBBU, directData[1]);
+	CHECK_EQ_U32(0xCCU, directData[2]);
+	CHECK_EQ_U32(0xDDU, directData[3]);
+
 	pdu[0] = 0x14U;
 	pdu[1] = 7U;
 	pdu[2] = 6U;
@@ -505,11 +547,14 @@ static int TestTableFileRecords(void)
 	pdu[8] = 2U;
 	size = 9U;
 	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
-	CHECK_EQ_U32(8U, size);
+	CHECK_EQ_U32(16U, size);
+	CHECK_EQ_U32(14U, pdu[1]);
+	CHECK_EQ_U32(13U, pdu[2]);
 	CHECK_EQ_U32(0xAAU, pdu[4]);
 	CHECK_EQ_U32(0xBBU, pdu[5]);
 	CHECK_EQ_U32(0xCCU, pdu[6]);
 	CHECK_EQ_U32(0xDDU, pdu[7]);
+	CHECK_EQ_U32(0x43U, pdu[15]);
 
 	pdu[0] = 0x15U;
 	pdu[1] = 9U;
@@ -524,6 +569,34 @@ static int TestTableFileRecords(void)
 	pdu[10] = 0U;
 	size = 11U;
 	CHECK_EQ_U32(_IllegalDataAddress, WriteFileRecord(0U, 0x15U, pdu, &size));
+
+	pdu[4] = MODBUS_TABLE_TEST_FILE;
+	pdu[5] = 0U;
+	pdu[6] = 8U;
+	size = 11U;
+	CHECK_EQ_U32(_IllegalDataAddress, WriteFileRecord(0U, 0x15U, pdu, &size));
+
+	memset(pdu, 0, sizeof(pdu));
+	pdu[0] = 0x14U;
+	pdu[1] = 7U;
+	pdu[2] = 6U;
+	pdu[4] = MODBUS_TABLE_TEST_FILE;
+	pdu[6] = 8U;
+	size = 9U;
+	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
+	CHECK_EQ_U32(4U, size);
+	CHECK_EQ_U32(2U, pdu[1]);
+	CHECK_EQ_U32(1U, pdu[2]);
+	CHECK_EQ_U32(6U, pdu[3]);
+
+	memset(pdu, 0, sizeof(pdu));
+	pdu[0] = 0x15U;
+	pdu[1] = 253U;
+	pdu[2] = 6U;
+	pdu[4] = MODBUS_TABLE_TEST_FILE;
+	pdu[8] = 123U;
+	size = 255U;
+	CHECK_EQ_U32(_IllegalDataValue, WriteFileRecord(0U, 0x15U, pdu, &size));
 	return 1;
 }
 

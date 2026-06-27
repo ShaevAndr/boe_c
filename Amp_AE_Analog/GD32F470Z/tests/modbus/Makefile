@@ -18,7 +18,7 @@ SOURCES := \
 	../../Modbus/ReadFileRecord.c \
 	../../Modbus/WriteFileRecord.c \
 	../../Modbus/Diagnostics.c \
-	../../Modbus/TabParamFiles.c \
+	../../Unicorn2/AccessTabParam.c \
 	../../Modbus/ReadDeviceIdentification.c \
 	../../Modbus/CommandParcerModbus.c \
 	../../Modbus/ModbusRtuFrame.c \

@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 
+uint8_t GetCountTabParam (uint32_t * count);
 uint8_t ReadTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
 											uint32_t offset, uint32_t wordSize, uint32_t stride,
 											uint32_t * size);

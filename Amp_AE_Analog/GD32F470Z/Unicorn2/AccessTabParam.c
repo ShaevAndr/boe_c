@@ -26,6 +26,15 @@ static uint8_t TestTable[TEST_TABLE_SIZE] = {
 	0x40U, 0x41U, 0x42U, 0x43U
 };
 
+uint8_t GetCountTabParam (uint32_t * count)
+{
+	if (count == 0)
+		return _ErrorSize;
+
+	*count = _TabPCount;
+	return _NoError;
+}
+//--------------------------------------------------------------------------//
 static uint8_t CopyTableData(uint8_t *destination, const uint8_t *source,
 	uint32_t tableSize, uint32_t offset, uint32_t wordSize, uint32_t stride,
 	uint32_t *size)
@@ -84,12 +93,15 @@ uint8_t WriteTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
 				ErrorNum = _ErrorSize;
 				break;
 			}
+			if ((offset > TEST_TABLE_SIZE) || (size > (TEST_TABLE_SIZE - offset)))
+			{
+				ErrorNum = _ErrorUnCorrParam;
+				break;
+			}
 			for (i = 0U; i < size; i++)
 			{
 				uint32_t dstOffset = offset + (i / stride) * stride + (i % stride);
 
-				if (dstOffset >= TEST_TABLE_SIZE)
-					break;
 				TestTable[dstOffset] = B[i];
 			}
 			break;
@@ -158,7 +170,7 @@ uint8_t ReleaseTabParam (uint8_t NumUART, uint32_t NumParam)
 uint8_t ReadDescrTabParam (uint8_t NumUART, uint32_t NumParam,
 	uint8_t * B, uint32_t * pSize)
 {
-	static const char Description[] = "Test table parameter";
+	static const char Description[] = "Test table parameter; file=100; bytes=16";
 
 	(void)NumUART;
 	if (pSize == 0)

@@ -44,6 +44,9 @@
 	#define _ReadFileRecord					0x14
 	#define _WriteFileRecord        0x15
 
+	// File numbers 100.. map to table parameter indexes 0...
+	#define MODBUS_TABLE_FILE_BASE  100U
+
 	//------------------------------------------------------------------------------
 	uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize);
 	//------------------------------------------------------------------------------

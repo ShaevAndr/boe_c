@@ -1095,16 +1095,6 @@
               <FilePath>.\Modbus\Diagnostics.c</FilePath>
             </File>
             <File>
-              <FileName>TabParamFiles.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Modbus\TabParamFiles.h</FilePath>
-            </File>
-            <File>
-              <FileName>TabParamFiles.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Modbus\TabParamFiles.c</FilePath>
-            </File>
-            <File>
               <FileName>ReadDeviceIdentification.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Modbus\ReadDeviceIdentification.h</FilePath>

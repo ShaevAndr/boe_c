@@ -4,11 +4,10 @@
      Filename: Diagnostics.c
      Description: FC 0x08 - Diagnostics extensions for table parameters.
 ============================================================================*/
-#include <string.h>
 #include "Diagnostics.h"
+#include "../Unicorn2/AccessTabParam.h"
 #include "ErrorHandler.h"
 #include "CommandParcerModbus.h"
-#include "TabParamFiles.h"
 
 #define DIAG_MAX_PDU_SIZE 253U
 
@@ -44,7 +43,6 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 	uint16_t subFunction = (uint16_t)(((uint16_t)B[1] << 8) | B[2]);
 	uint8_t err;
 
-	(void)NumUART;
 	B[0] = Command;
 
 	switch (subFunction)
@@ -55,7 +53,7 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 
 			if (reqSize != 3U)
 				return _IllegalDataValue;
-			err = ModbusTabParam_GetCount(&count);
+			err = GetCountTabParam(&count);
 			if (err != _NoError)
 				return ConvertUnicornErrorIntoModbusError(err);
 
@@ -67,13 +65,12 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 		case MODBUS_DIAG_TABLE_DESCRIPTION:
 		{
 			uint32_t tableIndex;
-			const char *description;
 			uint32_t descriptionSize;
 
 			if (reqSize != 7U)
 				return _IllegalDataValue;
 			tableIndex = GetU32Be(&B[3]);
-			err = ModbusTabParam_GetDescription(tableIndex, &description, &descriptionSize);
+			err = ReadDescrTabParam(NumUART, tableIndex, &B[11], &descriptionSize);
 			if (err != _NoError)
 				return ConvertUnicornErrorIntoModbusError(err);
 			if ((11U + descriptionSize) > DIAG_MAX_PDU_SIZE)
@@ -81,7 +78,6 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 
 			PutU32Be(&B[3], tableIndex);
 			PutU32Be(&B[7], descriptionSize);
-			memcpy(&B[11], description, descriptionSize);
 			*pSize = 11U + descriptionSize;
 			return _NoError;
 		}
@@ -91,11 +87,13 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 			uint32_t tableIndex;
 			int32_t column;
 
+			/* This subfunction is the Modbus equivalent of mode == 0
+			   (prepare table for reading), so mode is not transmitted. */
 			if (reqSize != 11U)
 				return _IllegalDataValue;
 			tableIndex = GetU32Be(&B[3]);
 			column = GetI32Be(&B[7]);
-			err = ModbusTabParam_Prepare(tableIndex, column);
+			err = PreparTabParam(NumUART, tableIndex, column);
 			if (err != _NoError)
 				return ConvertUnicornErrorIntoModbusError(err);
 
@@ -116,7 +114,7 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 			if (reqSize != 7U)
 				return _IllegalDataValue;
 			tableIndex = GetU32Be(&B[3]);
-			err = ModbusTabParam_GetPrepareProgress(tableIndex, &rows, &columns,
+			err = ProgrPreparTabParam(NumUART, tableIndex, &rows, &columns,
 				&currentStep, &stepsCount);
 			if (err != _NoError)
 				return ConvertUnicornErrorIntoModbusError(err);
@@ -137,7 +135,7 @@ uint8_t Diagnostics(uint8_t NumUART, uint8_t Command, uint8_t *B, uint32_t *pSiz
 			if (reqSize != 7U)
 				return _IllegalDataValue;
 			tableIndex = GetU32Be(&B[3]);
-			err = ModbusTabParam_Release(tableIndex);
+			err = ReleaseTabParam(NumUART, tableIndex);
 			if (err != _NoError)
 				return ConvertUnicornErrorIntoModbusError(err);
 

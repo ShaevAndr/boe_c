@@ -202,11 +202,11 @@ Fields:
 
 | Field | Size | Meaning |
 |---|---:|---|
-| `ByteCount` | 1 | request sub-request length, normally `7` |
+| `ByteCount` | 1 | request sub-request length, must be `7` |
 | `RefType` | 1 | file reference type, `6` |
 | `FileNumber` | 2 | file identifier |
 | `RecordNumber` | 2 | record index |
-| `RecordLength` | 2 | requested length in 16-bit records for table files |
+| `RecordLength` | 2 | retained for PDU compatibility; ignored when reading table files |
 | `ResponseDataLength` | 1 | `2 + len(RecordData)` |
 | `FileResponseLength` | 1 | `1 + len(RecordData)` |
 | `RecordData` | variable | bytes returned |
@@ -216,19 +216,23 @@ Supported files:
 | FileNumber | Name | Read behavior | Write behavior |
 |---:|---|---|---|
 | `1` | Device description | `RecordNumber * 245` byte offset, up to `245` bytes | not supported |
-| `100` | Test table parameter | `RecordNumber * 2` byte offset, `RecordLength * 2` bytes | supported by FC `0x15` |
+| `100` | Test table parameter | from `RecordNumber * 2`, up to `249` bytes per response | supported by FC `0x15` |
 
 Important compatibility notes:
 
 - For file `1`, `RecordLength` is validated only as non-zero; the response chunk size is driven by internal `CHUNK_SIZE = 245`.
-- For table files, `RecordLength` is interpreted as a count of 2-byte records, so byte count is `RecordLength * 2`.
-- If a valid offset reaches EOF, response can contain zero data bytes: `[14][02][01][06]`.
+- For table files, `RecordLength` does not limit the response; its value, including zero, is ignored.
+- Only one 7-byte sub-request is supported: request PDU size must be `9`, `ByteCount` must be `7`, and `RefType` must be `6`.
+- A table read requests up to `249` bytes from `AccessTabParam`, the maximum that fits after the 4-byte response overhead in a 253-byte PDU.
+- `AccessTabParam` receives `offset = RecordNumber * 2`, `size = 249`, `wordSize = 2`, and `stride = 2`; it reduces `size` to the bytes actually available.
+- If the offset is at or beyond EOF, `RecordData` is empty and the response is `[14][02][01][06]`.
+- No table-level CRC is present: the Modbus RTU CRC already covers the complete request and response frame.
 
-Example PDU, read first 8 bytes from table file `100`:
+Example PDU, read table file `100` from its beginning. `RecordLength=4` is present in the request but does not limit the response:
 
 ```text
 Request PDU:  14 07 06 00 64 00 00 00 04
-Response PDU: 14 0A 09 06 10 11 12 13 20 21 22 23
+Response PDU: 14 12 11 06 10 11 12 13 20 21 22 23 30 31 32 33 40 41 42 43
 ```
 
 ## FC 0x15 - Write File Record
@@ -259,6 +263,8 @@ Validation:
 - PDU size must equal `2 + ByteCount`.
 - `ByteCount` must equal `7 + RecordLength * 2`.
 - `RefType` must be `6`.
+- `RecordLength` must be in the range `1..122`, keeping the request within the 253-byte PDU limit.
+- `AccessTabParam` receives `offset = RecordNumber * 2`, `size = RecordLength * 2`, and `stride = 2`.
 - Write range must fit inside the table file.
 
 Example PDU, write 4 bytes at byte offset `4` of table file `100`:
@@ -314,7 +320,7 @@ Request PDU:
 
 Response PDU echoes `[08][00][07][TableIndex:4][Column:4]`.
 
-`Column` is signed int32 BE. Current stub accepts the value and returns success for table index `0`.
+`Column` is signed int32 BE. This subfunction always means read preparation (`mode = 0` in the Unicorn table protocol), so no separate mode field is transmitted. Current stub accepts the value and returns success for table index `0`.
 
 ### Subfunction 0x0008 - prepare progress
 
