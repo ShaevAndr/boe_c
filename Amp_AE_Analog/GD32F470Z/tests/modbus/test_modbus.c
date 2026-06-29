@@ -22,8 +22,14 @@
 #include "../../deviceInfo/deviceDescription.h"
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
-#define MODBUS_TABLE_TEST_FILE (MODBUS_TABLE_FILE_BASE + _TabTestTable)
-#define MODBUS_TABLE_TEST_INDEX _TabTestTable
+#define FACTORY_CALIBRATION_ROWS 4U
+#define FACTORY_CALIBRATION_COLUMNS 6U
+#define FACTORY_CALIBRATION_STEPS 4U
+#define FACTORY_CALIBRATION_TABLE_SIZE \
+	(FACTORY_CALIBRATION_ROWS * FACTORY_CALIBRATION_COLUMNS * sizeof(float))
+#define MODBUS_TABLE_TEST_FILE \
+	(MODBUS_TABLE_FILE_BASE + _TabFactoryCalibrationParameters)
+#define MODBUS_TABLE_TEST_INDEX _TabFactoryCalibrationParameters
 
 static unsigned testsRun;
 static unsigned testsFailed;
@@ -63,6 +69,14 @@ static unsigned intWriteCount;
 static unsigned floatReadCount;
 static unsigned floatWriteCount;
 static unsigned telemetryReadCount;
+
+static const float ExpectedFactoryCalibrationParameters
+	[FACTORY_CALIBRATION_ROWS][FACTORY_CALIBRATION_COLUMNS] = {
+	{1.001F, 1.002F, 1.003F, 1.004F, 1.005F, 1.006F},
+	{-0.01001F, -0.01002F, -0.01003F, -0.01004F, -0.01005F, -0.01006F},
+	{0.991F, 0.992F, 0.993F, 0.994F, 0.995F, 0.996F},
+	{0.101F, 0.102F, 0.103F, 0.104F, 0.105F, 0.106F}
+};
 
 const char *UnitDescription = "BUE-8 test device";
 
@@ -171,6 +185,29 @@ static uint32_t GetU32Be(const uint8_t *source)
 	       ((uint32_t)source[1] << 16) |
 	       ((uint32_t)source[2] << 8) |
 	       (uint32_t)source[3];
+}
+
+static int CompleteFactoryCalibrationPreparation(void)
+{
+	uint32_t step;
+	int32_t rows;
+	int32_t columns;
+	int32_t currentStep;
+	int32_t stepsCount;
+
+	CHECK_EQ_U32(_NoError,
+		PreparTabParam(0U, MODBUS_TABLE_TEST_INDEX, -1));
+	for (step = 1U; step <= FACTORY_CALIBRATION_STEPS; step++)
+	{
+		CHECK_EQ_U32(_NoError,
+			ProgrPreparTabParam(0U, MODBUS_TABLE_TEST_INDEX,
+				&rows, &columns, &currentStep, &stepsCount));
+		CHECK_EQ_U32(FACTORY_CALIBRATION_ROWS, rows);
+		CHECK_EQ_U32(FACTORY_CALIBRATION_COLUMNS, columns);
+		CHECK_EQ_U32(step, currentStep);
+		CHECK_EQ_U32(FACTORY_CALIBRATION_STEPS, stepsCount);
+	}
+	return 1;
 }
 
 static uint32_t BuildRtuRequest(
@@ -435,18 +472,101 @@ static int TestWriteMultipleValidation(void)
 	return 1;
 }
 
+static int TestFactoryCalibrationDescription(void)
+{
+	CHECK_EQ_U32(strlen(DeviceDescription), descriptionLength);
+	CHECK(strstr(DeviceDescription,
+		"\"Table\":[{\"ID\":\"FactoryCalibrationParameters\","
+		"\"Name\":\"Заводская калибровка\",\"Num\":0,"
+		"\"Type\":\"Regular\",\"DataType\":\"float\"") != NULL);
+	CHECK(strstr(DeviceDescription,
+		"\"ColumnCount\":6,\"RowCount\":4,"
+		"\"NeedParamPrepare\":true,\"Access\":\"rw\"") != NULL);
+	CHECK(strstr(DeviceDescription,
+		"\"Row\":0,\"Name\":\"Масштаб входов\"") != NULL);
+	CHECK(strstr(DeviceDescription,
+		"\"Row\":3,\"Name\":\"Смещение выхода 4-20 мА\"") != NULL);
+	return 1;
+}
+
+static int TestFactoryCalibrationPreparation(void)
+{
+	uint8_t data[FACTORY_CALIBRATION_TABLE_SIZE];
+	uint32_t size;
+	uint32_t step;
+	int32_t rows = -1;
+	int32_t columns = -1;
+	int32_t currentStep = -1;
+	int32_t stepsCount = -1;
+
+	CHECK_EQ_U32(_NoError,
+		ReleaseTabParam(0U, MODBUS_TABLE_TEST_INDEX));
+	size = sizeof(float);
+	CHECK_EQ_U32(_ErrorDataNotReady,
+		ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, data,
+			0U, sizeof(float), sizeof(float), &size));
+	CHECK_EQ_U32(_ErrorDataNotReady,
+		ProgrPreparTabParam(0U, MODBUS_TABLE_TEST_INDEX,
+			&rows, &columns, &currentStep, &stepsCount));
+	CHECK_EQ_U32(0U, rows);
+	CHECK_EQ_U32(0U, columns);
+	CHECK_EQ_U32(0U, currentStep);
+	CHECK_EQ_U32(0U, stepsCount);
+
+	CHECK_EQ_U32(_NoError,
+		PreparTabParam(0U, MODBUS_TABLE_TEST_INDEX, 3));
+	for (step = 1U; step <= FACTORY_CALIBRATION_STEPS; step++)
+	{
+		CHECK_EQ_U32(_NoError,
+			ProgrPreparTabParam(0U, MODBUS_TABLE_TEST_INDEX,
+				&rows, &columns, &currentStep, &stepsCount));
+		CHECK_EQ_U32(FACTORY_CALIBRATION_ROWS, rows);
+		CHECK_EQ_U32(FACTORY_CALIBRATION_COLUMNS, columns);
+		CHECK_EQ_U32(step, currentStep);
+		CHECK_EQ_U32(FACTORY_CALIBRATION_STEPS, stepsCount);
+
+		size = sizeof(float);
+		CHECK_EQ_U32(step < FACTORY_CALIBRATION_STEPS
+				? _ErrorDataNotReady : _NoError,
+			ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, data,
+				0U, sizeof(float), sizeof(float), &size));
+	}
+
+	size = sizeof(data);
+	CHECK_EQ_U32(_NoError,
+		ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, data,
+			0U, sizeof(float), sizeof(float), &size));
+	CHECK_EQ_U32(sizeof(data), size);
+	CHECK(memcmp(data, ExpectedFactoryCalibrationParameters, sizeof(data)) == 0);
+
+	CHECK_EQ_U32(_NoError,
+		ProgrPreparTabParam(0U, MODBUS_TABLE_TEST_INDEX,
+			&rows, &columns, &currentStep, &stepsCount));
+	CHECK_EQ_U32(FACTORY_CALIBRATION_STEPS, currentStep);
+
+	CHECK_EQ_U32(_NoError,
+		ReleaseTabParam(0U, MODBUS_TABLE_TEST_INDEX));
+	size = sizeof(float);
+	CHECK_EQ_U32(_ErrorDataNotReady,
+		ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, data,
+			0U, sizeof(float), sizeof(float), &size));
+	return 1;
+}
+
 static int TestReadFileRecord(void)
 {
 	uint8_t pdu[256] = {0x14U, 7U, 6U, 0U, 1U, 0U, 0U, 0U, 1U};
 	uint32_t size = 9U;
 	uint32_t expectedLength = (uint32_t)strlen(DeviceDescription);
+	uint32_t expectedChunkLength = expectedLength > 245U ? 245U : expectedLength;
+	uint16_t eofRecord = (uint16_t)((expectedLength + 244U) / 245U);
 
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
-	CHECK_EQ_U32(4U + expectedLength, size);
-	CHECK_EQ_U32(2U + expectedLength, pdu[1]);
-	CHECK_EQ_U32(1U + expectedLength, pdu[2]);
+	CHECK_EQ_U32(4U + expectedChunkLength, size);
+	CHECK_EQ_U32(2U + expectedChunkLength, pdu[1]);
+	CHECK_EQ_U32(1U + expectedChunkLength, pdu[2]);
 	CHECK_EQ_U32(6U, pdu[3]);
-	CHECK(memcmp(&pdu[4], DeviceDescription, expectedLength) == 0);
+	CHECK(memcmp(&pdu[4], DeviceDescription, expectedChunkLength) == 0);
 
 	memset(pdu, 0, 9U);
 	pdu[0] = 0x14U;
@@ -462,7 +582,8 @@ static int TestReadFileRecord(void)
 	pdu[1] = 7U;
 	pdu[2] = 6U;
 	pdu[4] = 1U;
-	pdu[6] = 1U;
+	pdu[5] = (uint8_t)(eofRecord >> 8);
+	pdu[6] = (uint8_t)eofRecord;
 	pdu[8] = 1U;
 	size = 9U;
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
@@ -494,21 +615,24 @@ static int TestReadFileRecord(void)
 
 static int TestTableFileRecords(void)
 {
-	uint8_t pdu[256] = {0x14U, 7U, 6U, 0U, MODBUS_TABLE_TEST_FILE, 0U, 0U, 0U, 4U};
+	uint8_t pdu[256] = {
+		0x14U, 7U, 6U, 0U, MODBUS_TABLE_TEST_FILE, 0U, 0U, 0U, 4U
+	};
+	uint8_t expectedData[FACTORY_CALIBRATION_TABLE_SIZE];
+	uint8_t directData[sizeof(float)];
+	float replacementValue = 42.25F;
 	uint32_t size = 9U;
-	uint8_t directData[4];
 	uint32_t directSize;
 
+	memcpy(expectedData, ExpectedFactoryCalibrationParameters,
+		sizeof(expectedData));
+	CHECK(CompleteFactoryCalibrationPreparation());
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
-	CHECK_EQ_U32(20U, size);
-	CHECK_EQ_U32(18U, pdu[1]);
-	CHECK_EQ_U32(17U, pdu[2]);
+	CHECK_EQ_U32(4U + sizeof(expectedData), size);
+	CHECK_EQ_U32(2U + sizeof(expectedData), pdu[1]);
+	CHECK_EQ_U32(1U + sizeof(expectedData), pdu[2]);
 	CHECK_EQ_U32(6U, pdu[3]);
-	CHECK_EQ_U32(0x10U, pdu[4]);
-	CHECK_EQ_U32(0x11U, pdu[5]);
-	CHECK_EQ_U32(0x12U, pdu[6]);
-	CHECK_EQ_U32(0x13U, pdu[7]);
-	CHECK_EQ_U32(0x43U, pdu[19]);
+	CHECK(memcmp(&pdu[4], expectedData, sizeof(expectedData)) == 0);
 
 	pdu[0] = 0x15U;
 	pdu[1] = 11U;
@@ -519,60 +643,51 @@ static int TestTableFileRecords(void)
 	pdu[6] = 2U;
 	pdu[7] = 0U;
 	pdu[8] = 2U;
-	pdu[9] = 0xAAU;
-	pdu[10] = 0xBBU;
-	pdu[11] = 0xCCU;
-	pdu[12] = 0xDDU;
+	memcpy(&pdu[9], &replacementValue, sizeof(replacementValue));
 	size = 13U;
 	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
 	CHECK_EQ_U32(13U, size);
 
 	directSize = sizeof(directData);
-	CHECK_EQ_U32(_NoError, ReadTabParam(0U, _TabTestTable, directData,
-		4U, 2U, 2U, &directSize));
-	CHECK_EQ_U32(sizeof(directData), directSize);
-	CHECK_EQ_U32(0xAAU, directData[0]);
-	CHECK_EQ_U32(0xBBU, directData[1]);
-	CHECK_EQ_U32(0xCCU, directData[2]);
-	CHECK_EQ_U32(0xDDU, directData[3]);
+	CHECK_EQ_U32(_ErrorDataNotReady,
+		ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, directData,
+			4U, sizeof(float), sizeof(float), &directSize));
 
+	CHECK(CompleteFactoryCalibrationPreparation());
+	directSize = sizeof(directData);
+	CHECK_EQ_U32(_NoError,
+		ReadTabParam(0U, MODBUS_TABLE_TEST_INDEX, directData,
+			4U, sizeof(float), sizeof(float), &directSize));
+	CHECK_EQ_U32(sizeof(directData), directSize);
+	CHECK(memcmp(directData, &replacementValue, sizeof(replacementValue)) == 0);
+	memcpy(&expectedData[sizeof(float)], &replacementValue,
+		sizeof(replacementValue));
+
+	memset(pdu, 0, sizeof(pdu));
 	pdu[0] = 0x14U;
 	pdu[1] = 7U;
 	pdu[2] = 6U;
-	pdu[3] = 0U;
 	pdu[4] = MODBUS_TABLE_TEST_FILE;
-	pdu[5] = 0U;
 	pdu[6] = 2U;
-	pdu[7] = 0U;
 	pdu[8] = 2U;
 	size = 9U;
 	CHECK_EQ_U32(_NoError, ModbusCommandProcess(0U, pdu, &size));
-	CHECK_EQ_U32(16U, size);
-	CHECK_EQ_U32(14U, pdu[1]);
-	CHECK_EQ_U32(13U, pdu[2]);
-	CHECK_EQ_U32(0xAAU, pdu[4]);
-	CHECK_EQ_U32(0xBBU, pdu[5]);
-	CHECK_EQ_U32(0xCCU, pdu[6]);
-	CHECK_EQ_U32(0xDDU, pdu[7]);
-	CHECK_EQ_U32(0x43U, pdu[15]);
+	CHECK_EQ_U32(4U + sizeof(expectedData) - 4U, size);
+	CHECK_EQ_U32(2U + sizeof(expectedData) - 4U, pdu[1]);
+	CHECK_EQ_U32(1U + sizeof(expectedData) - 4U, pdu[2]);
+	CHECK(memcmp(&pdu[4], &expectedData[4], sizeof(expectedData) - 4U) == 0);
 
+	memset(pdu, 0, sizeof(pdu));
 	pdu[0] = 0x15U;
 	pdu[1] = 9U;
 	pdu[2] = 6U;
-	pdu[3] = 0U;
 	pdu[4] = 0xFFU;
-	pdu[5] = 0U;
-	pdu[6] = 0U;
-	pdu[7] = 0U;
 	pdu[8] = 1U;
-	pdu[9] = 0U;
-	pdu[10] = 0U;
 	size = 11U;
 	CHECK_EQ_U32(_IllegalDataAddress, WriteFileRecord(0U, 0x15U, pdu, &size));
 
 	pdu[4] = MODBUS_TABLE_TEST_FILE;
-	pdu[5] = 0U;
-	pdu[6] = 8U;
+	pdu[6] = 48U;
 	size = 11U;
 	CHECK_EQ_U32(_IllegalDataAddress, WriteFileRecord(0U, 0x15U, pdu, &size));
 
@@ -581,7 +696,7 @@ static int TestTableFileRecords(void)
 	pdu[1] = 7U;
 	pdu[2] = 6U;
 	pdu[4] = MODBUS_TABLE_TEST_FILE;
-	pdu[6] = 8U;
+	pdu[6] = 48U;
 	size = 9U;
 	CHECK_EQ_U32(_NoError, ReadFileRecord(0U, 0x14U, pdu, &size));
 	CHECK_EQ_U32(4U, size);
@@ -597,6 +712,8 @@ static int TestTableFileRecords(void)
 	pdu[8] = 123U;
 	size = 255U;
 	CHECK_EQ_U32(_IllegalDataValue, WriteFileRecord(0U, 0x15U, pdu, &size));
+	CHECK_EQ_U32(_NoError,
+		ReleaseTabParam(0U, MODBUS_TABLE_TEST_INDEX));
 	return 1;
 }
 
@@ -604,8 +721,13 @@ static int TestDiagnosticsTableFunctions(void)
 {
 	uint8_t pdu[128] = {0x08U, 0U, MODBUS_DIAG_TABLE_COUNT};
 	uint32_t size = 3U;
-	const char expectedDescription[] = "Test table parameter; file=100; bytes=16";
+	uint32_t step;
+	const char expectedDescription[] =
+		"FactoryCalibrationParameters; file=100; rows=4; columns=6; "
+		"data=float32; bytes=96";
 
+	CHECK_EQ_U32(_NoError,
+		ReleaseTabParam(0U, MODBUS_TABLE_TEST_INDEX));
 	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
 	CHECK_EQ_U32(7U, size);
 	CHECK_EQ_U32(1U, GetU32Be(&pdu[3]));
@@ -631,17 +753,20 @@ static int TestDiagnosticsTableFunctions(void)
 	CHECK_EQ_U32(11U, size);
 	CHECK_EQ_U32(3U, GetU32Be(&pdu[7]));
 
-	pdu[0] = 0x08U;
-	pdu[1] = 0U;
-	pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
-	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
-	size = 7U;
-	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
-	CHECK_EQ_U32(23U, size);
-	CHECK_EQ_U32(1U, GetU32Be(&pdu[7]));
-	CHECK_EQ_U32(1U, GetU32Be(&pdu[11]));
-	CHECK_EQ_U32(4U, GetU32Be(&pdu[15]));
-	CHECK_EQ_U32(4U, GetU32Be(&pdu[19]));
+	for (step = 1U; step <= FACTORY_CALIBRATION_STEPS; step++)
+	{
+		pdu[0] = 0x08U;
+		pdu[1] = 0U;
+		pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
+		PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+		size = 7U;
+		CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+		CHECK_EQ_U32(23U, size);
+		CHECK_EQ_U32(step, GetU32Be(&pdu[7]));
+		CHECK_EQ_U32(FACTORY_CALIBRATION_STEPS, GetU32Be(&pdu[11]));
+		CHECK_EQ_U32(FACTORY_CALIBRATION_ROWS, GetU32Be(&pdu[15]));
+		CHECK_EQ_U32(FACTORY_CALIBRATION_COLUMNS, GetU32Be(&pdu[19]));
+	}
 
 	pdu[0] = 0x08U;
 	pdu[1] = 0U;
@@ -651,6 +776,14 @@ static int TestDiagnosticsTableFunctions(void)
 	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
 	CHECK_EQ_U32(7U, size);
 
+	pdu[0] = 0x08U;
+	pdu[1] = 0U;
+	pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
+	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
+	size = 7U;
+	CHECK_EQ_U32(_SlaveDeviceBusy, Diagnostics(0U, 0x08U, pdu, &size));
+
+	pdu[2] = MODBUS_DIAG_TABLE_RELEASE;
 	PutU32Be(&pdu[3], 0x12345678UL);
 	size = 7U;
 	CHECK_EQ_U32(_IllegalDataAddress, Diagnostics(0U, 0x08U, pdu, &size));
@@ -821,6 +954,8 @@ int main(void)
 	RUN_TEST(TestWriteSingleValidationAndBackendError);
 	RUN_TEST(TestWriteMultipleAcrossTypeBoundary);
 	RUN_TEST(TestWriteMultipleValidation);
+	RUN_TEST(TestFactoryCalibrationDescription);
+	RUN_TEST(TestFactoryCalibrationPreparation);
 	RUN_TEST(TestReadFileRecord);
 	RUN_TEST(TestTableFileRecords);
 	RUN_TEST(TestDiagnosticsTableFunctions);

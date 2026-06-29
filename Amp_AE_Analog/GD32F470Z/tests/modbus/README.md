@@ -21,7 +21,8 @@ make -C tests/modbus sanitize
 
 - mapping INT/FLOAT/telemetry адресов;
 - преобразование внутренних ошибок в Modbus exceptions;
-- FC `0x03`, `0x04`, `0x06`, `0x10`, `0x14`;
+- FC `0x03`, `0x04`, `0x06`, `0x08`, `0x10`, `0x14`, `0x15`;
+- таблица `FactoryCalibrationParameters`: описание 4×6 `float`, моковые данные, четырёхэтапная подготовка, инвалидация после записи и release;
 - FC `0x2B` / MEI `0x0E` Read Device Identification;
 - валидация размеров, количества и адресов;
 - big-endian сериализация 32-битных значений;

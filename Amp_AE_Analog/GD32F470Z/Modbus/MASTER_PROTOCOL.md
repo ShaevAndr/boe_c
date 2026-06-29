@@ -216,7 +216,7 @@ Supported files:
 | FileNumber | Name | Read behavior | Write behavior |
 |---:|---|---|---|
 | `1` | Device description | `RecordNumber * 245` byte offset, up to `245` bytes | not supported |
-| `100` | Test table parameter | from `RecordNumber * 2`, up to `249` bytes per response | supported by FC `0x15` |
+| `100` | `FactoryCalibrationParameters` (4×6 `float32`, 96 bytes) | from `RecordNumber * 2`, after preparation | supported by FC `0x15` |
 
 Important compatibility notes:
 
@@ -226,13 +226,15 @@ Important compatibility notes:
 - A table read requests up to `249` bytes from `AccessTabParam`, the maximum that fits after the 4-byte response overhead in a 253-byte PDU.
 - `AccessTabParam` receives `offset = RecordNumber * 2`, `size = 249`, `wordSize = 2`, and `stride = 2`; it reduces `size` to the bytes actually available.
 - If the offset is at or beyond EOF, `RecordData` is empty and the response is `[14][02][01][06]`.
+- Table `0` must be prepared before reading. Four progress requests prepare one row each; reads before step `4/4` return `SlaveDeviceBusy`.
+- Writing table `0` invalidates the prepared snapshot, so it must be prepared again before the next read.
 - No table-level CRC is present: the Modbus RTU CRC already covers the complete request and response frame.
 
-Example PDU, read table file `100` from its beginning. `RecordLength=4` is present in the request but does not limit the response:
+Example PDU, read prepared table file `100` from its beginning. `RecordLength=4` is present in the request but does not limit the response:
 
 ```text
 Request PDU:  14 07 06 00 64 00 00 00 04
-Response PDU: 14 12 11 06 10 11 12 13 20 21 22 23 30 31 32 33 40 41 42 43
+Response PDU: 14 62 61 06 [96 bytes of row-major float32 data]
 ```
 
 ## FC 0x15 - Write File Record
@@ -308,7 +310,7 @@ Response PDU:
 [08][00][06][TableIndex:4][DescriptionSize:4][ASCII Description...]
 ```
 
-Current table index `0` description is `Test table parameter; file=100; bytes=16`.
+Current table index `0` description is `FactoryCalibrationParameters; file=100; rows=4; columns=6; data=float32; bytes=96`.
 
 ### Subfunction 0x0007 - prepare table
 
@@ -320,7 +322,7 @@ Request PDU:
 
 Response PDU echoes `[08][00][07][TableIndex:4][Column:4]`.
 
-`Column` is signed int32 BE. This subfunction always means read preparation (`mode = 0` in the Unicorn table protocol), so no separate mode field is transmitted. Current stub accepts the value and returns success for table index `0`.
+`Column` is signed int32 BE. This subfunction always means read preparation (`mode = 0` in the Unicorn table protocol), so no separate mode field is transmitted. For table index `0`, it starts a new four-stage preparation and invalidates any previous snapshot.
 
 ### Subfunction 0x0008 - prepare progress
 
@@ -336,7 +338,7 @@ Response PDU:
 [08][00][08][TableIndex:4][CurrentStep:4][StepsCount:4][Rows:4][Columns:4]
 ```
 
-Current stub values for table index `0`: `CurrentStep=1`, `StepsCount=1`, `Rows=4`, `Columns=4`.
+For table index `0`, successive progress requests return `CurrentStep=1..4`, `StepsCount=4`, `Rows=4`, `Columns=6`. Each request prepares one row. Further requests remain at step `4`; requests before preparation or after release return `SlaveDeviceBusy`.
 
 ### Subfunction 0x0009 - release table
 

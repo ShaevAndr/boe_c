@@ -15,16 +15,24 @@
 #include "CommandParser.h"
 #include "AccessTabParam.h"
 
-#define TEST_TABLE_SIZE 16U
-#define TEST_TABLE_ROWS 4
-#define TEST_TABLE_COLUMNS 4
+#define FACTORY_CALIBRATION_ROWS 4
+#define FACTORY_CALIBRATION_COLUMNS 6
+#define FACTORY_CALIBRATION_PREPARATION_STEPS 4
+#define FACTORY_CALIBRATION_TABLE_SIZE \
+	((uint32_t)sizeof(FactoryCalibrationParameters))
 
-static uint8_t TestTable[TEST_TABLE_SIZE] = {
-	0x10U, 0x11U, 0x12U, 0x13U,
-	0x20U, 0x21U, 0x22U, 0x23U,
-	0x30U, 0x31U, 0x32U, 0x33U,
-	0x40U, 0x41U, 0x42U, 0x43U
+static float MockFactoryCalibrationParameters
+	[FACTORY_CALIBRATION_ROWS][FACTORY_CALIBRATION_COLUMNS] = {
+	{1.001F, 1.002F, 1.003F, 1.004F, 1.005F, 1.006F},
+	{-0.01001F, -0.01002F, -0.01003F, -0.01004F, -0.01005F, -0.01006F},
+	{0.991F, 0.992F, 0.993F, 0.994F, 0.995F, 0.996F},
+	{0.101F, 0.102F, 0.103F, 0.104F, 0.105F, 0.106F}
 };
+
+static float FactoryCalibrationParameters
+	[FACTORY_CALIBRATION_ROWS][FACTORY_CALIBRATION_COLUMNS];
+static int32_t FactoryCalibrationPreparationStep;
+static uint8_t FactoryCalibrationPreparationActive;
 
 uint8_t GetCountTabParam (uint32_t * count)
 {
@@ -68,8 +76,17 @@ uint8_t ReadTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
 	(void)NumUART;
 	switch (NumParam)
 	{
-		case _TabTestTable:
-			ErrorNum = CopyTableData(B, TestTable, TEST_TABLE_SIZE,
+		case _TabFactoryCalibrationParameters:
+			if ((FactoryCalibrationPreparationActive == 0U) ||
+				(FactoryCalibrationPreparationStep <
+					FACTORY_CALIBRATION_PREPARATION_STEPS))
+			{
+				ErrorNum = _ErrorDataNotReady;
+				break;
+			}
+			ErrorNum = CopyTableData(B,
+				(const uint8_t *)FactoryCalibrationParameters,
+				FACTORY_CALIBRATION_TABLE_SIZE,
 				offset, wordSize, stride, size);
 			break;
 
@@ -87,13 +104,14 @@ uint8_t WriteTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
 	(void)NumUART;
 	switch (NumParam)
 	{
-		case _TabTestTable:
+		case _TabFactoryCalibrationParameters:
 			if ((B == 0) || (stride == 0U))
 			{
 				ErrorNum = _ErrorSize;
 				break;
 			}
-			if ((offset > TEST_TABLE_SIZE) || (size > (TEST_TABLE_SIZE - offset)))
+			if ((offset > FACTORY_CALIBRATION_TABLE_SIZE) ||
+				(size > (FACTORY_CALIBRATION_TABLE_SIZE - offset)))
 			{
 				ErrorNum = _ErrorUnCorrParam;
 				break;
@@ -102,8 +120,10 @@ uint8_t WriteTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
 			{
 				uint32_t dstOffset = offset + (i / stride) * stride + (i % stride);
 
-				TestTable[dstOffset] = B[i];
+				((uint8_t *)MockFactoryCalibrationParameters)[dstOffset] = B[i];
 			}
+			FactoryCalibrationPreparationActive = 0U;
+			FactoryCalibrationPreparationStep = 0;
 			break;
 
 		default: ErrorNum = _ErrorUnCorrParam; break;
@@ -118,8 +138,12 @@ uint8_t PreparTabParam (uint8_t NumUART, uint32_t NumParam, int32_t column)
 	(void)NumUART;
 	switch (NumParam)
 	{
-		case _TabTestTable:
+		case _TabFactoryCalibrationParameters:
 			(void)column;
+			memset(FactoryCalibrationParameters, 0,
+				sizeof(FactoryCalibrationParameters));
+			FactoryCalibrationPreparationStep = 0;
+			FactoryCalibrationPreparationActive = 1U;
 			ErrorNum = _NoError;
 			break;
 
@@ -140,11 +164,25 @@ uint8_t ProgrPreparTabParam (uint8_t NumUART, uint32_t NumParam,
 	*rows = *column = *curStep = *stepsCount = 0;
 	switch (NumParam)
 	{
-		case _TabTestTable:
-			*rows = TEST_TABLE_ROWS;
-			*column = TEST_TABLE_COLUMNS;
-			*curStep = 1;
-			*stepsCount = 1;
+		case _TabFactoryCalibrationParameters:
+			if (FactoryCalibrationPreparationActive == 0U)
+			{
+				ErrorNum = _ErrorDataNotReady;
+				break;
+			}
+			if (FactoryCalibrationPreparationStep <
+				FACTORY_CALIBRATION_PREPARATION_STEPS)
+			{
+				memcpy(
+					FactoryCalibrationParameters[FactoryCalibrationPreparationStep],
+					MockFactoryCalibrationParameters[FactoryCalibrationPreparationStep],
+					sizeof(FactoryCalibrationParameters[0]));
+				FactoryCalibrationPreparationStep++;
+			}
+			*rows = FACTORY_CALIBRATION_ROWS;
+			*column = FACTORY_CALIBRATION_COLUMNS;
+			*curStep = FactoryCalibrationPreparationStep;
+			*stepsCount = FACTORY_CALIBRATION_PREPARATION_STEPS;
 			break;
 
 		default: ErrorNum = _ErrorUnCorrParam; break;
@@ -158,7 +196,11 @@ uint8_t ReleaseTabParam (uint8_t NumUART, uint32_t NumParam)
 	(void)NumUART;
 	switch (NumParam)
 	{
-		case _TabTestTable:
+		case _TabFactoryCalibrationParameters:
+			memset(FactoryCalibrationParameters, 0,
+				sizeof(FactoryCalibrationParameters));
+			FactoryCalibrationPreparationStep = 0;
+			FactoryCalibrationPreparationActive = 0U;
 			ErrorNum = _NoError;
 			break;
 
@@ -170,7 +212,9 @@ uint8_t ReleaseTabParam (uint8_t NumUART, uint32_t NumParam)
 uint8_t ReadDescrTabParam (uint8_t NumUART, uint32_t NumParam,
 	uint8_t * B, uint32_t * pSize)
 {
-	static const char Description[] = "Test table parameter; file=100; bytes=16";
+	static const char Description[] =
+		"FactoryCalibrationParameters; file=100; rows=4; columns=6; "
+		"data=float32; bytes=96";
 
 	(void)NumUART;
 	if (pSize == 0)
@@ -179,7 +223,7 @@ uint8_t ReadDescrTabParam (uint8_t NumUART, uint32_t NumParam,
 	*pSize = 0;
 	switch (NumParam)
 	{
-		case _TabTestTable:
+		case _TabFactoryCalibrationParameters:
 			if (B == 0)
 				return _ErrorSize;
 			memcpy(B, Description, sizeof(Description) - 1U);

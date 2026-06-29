@@ -222,7 +222,7 @@
 	typedef enum {
 		_TabPUnknown		= -1,
 
-		_TabTestTable,
+		_TabFactoryCalibrationParameters,
 
 		_TabPCount
 	} TabParams;
