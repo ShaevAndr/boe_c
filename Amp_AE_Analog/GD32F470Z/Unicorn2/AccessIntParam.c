@@ -274,24 +274,6 @@ int8_t AccessIntParam (IntParam_t NumParam, int32_t * Value, ParamAccessMode_t A
 			}
 			break;
 
-		case _IP_ProtocolMode:
-			switch (AccessMode)
-			{
-				case _PAM_WO:
-				case _PAM_RW:
-					if (*Value < 0) *Value = 0;
-					if (*Value > 1) *Value = 1;
-					gParamApp.ProtocolMode = (uint8_t)*Value;
-					SaveParamApp ();
-					if (AccessMode == _PAM_WO) break;
-				case _PAM_RO:
-					*Value = (int32_t)gParamApp.ProtocolMode;
-					break;
-				default:
-					break;
-			}
-			break;
-
 		default:
 			Ret = _ErrorUnCorrParam;
 			break;
@@ -529,15 +511,6 @@ int8_t AccessDescIntParam (IntParam_t NumParam, DescriptParam_t * P)
 			strncpy (P->formatStr,"%d",				sizeof (P->formatStr));
 			strncpy (P->uniqueId,	"NumberErrorWriteDeviceUsStat",		sizeof (P->uniqueId));
 			strncpy (P->access,		"RO",				sizeof (P->access));
-			break;
-		
-		case _IP_ProtocolMode:
-			strncpy (P->name, "ProtocolMode", sizeof (P->name));
-			strncpy (P->unit, "_", sizeof (P->unit));
-			strncpy (P->formatStr, "%d", sizeof (P->formatStr));
-			strncpy (P->uniqueId, "ProtocolMode", sizeof (P->uniqueId));
-			P->minValuei = 0;
-			P->maxValuei = 1;
 			break;
 
 		default: Ret = _ErrorUnCorrParam; break;

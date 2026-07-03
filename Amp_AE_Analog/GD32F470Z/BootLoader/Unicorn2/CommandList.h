@@ -54,4 +54,11 @@
 		_TelPCount
 	} TelemParam_t;
 	//--------------------------------------------------------------------------//
+	typedef enum {
+		_TablePUnknown		= -1,
+		_tblpRS485Params,
+		
+		_TblPCount
+	} TableParam_t;
+	//--------------------------------------------------------------------------//
 #endif //CommandList_H

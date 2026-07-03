@@ -28,6 +28,8 @@ typedef struct
   struct {
     uint8_t UARTSpeed;
     uint8_t ModbusAddress;
+		uint8_t ProtocolMode;
+		uint8_t reserved;
   } rs485Modbus[PARAMSAVED_RS485_MODBUS_COUNT];
   
   struct {

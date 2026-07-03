@@ -73,10 +73,8 @@ int main (void)
   LoadParamApp (&main_storage);
   loadLockUnlockStatus();
   CommandParserInit();
-	
-	gParamApp.ProtocolMode = 1;
 
-  if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
+  if (gParamSystem.ProtocolMode == PROTOCOL_MODBUS)
   {
     ModbusRtuRoutine_Init();
   }
@@ -123,7 +121,7 @@ int main (void)
 			}
 		}
 		
-    if (gParamApp.ProtocolMode == PROTOCOL_MODBUS)
+    if (gParamSystem.ProtocolMode == PROTOCOL_MODBUS)
       ModbusRtuRoutine();
     else
       Unicorn2Routine();

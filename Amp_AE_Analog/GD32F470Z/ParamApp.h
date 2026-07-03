@@ -40,7 +40,6 @@ typedef struct
 	DS_Location_t DSLoc [_NumDS18B20];
 	float ICPMinVoltage;
   int8_t Ku_OP [8];
-  uint8_t ProtocolMode;
 
 	uint16_t	CRC16;
 } TParamApp;

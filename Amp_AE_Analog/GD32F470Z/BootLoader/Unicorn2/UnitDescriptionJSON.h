@@ -107,6 +107,57 @@ JSON\n
 			"Type": "Time"
 		}
 	],
+	"Table": [
+		{
+			"Num": 0,
+			"ID": "RS485Params",
+			"Access": "rw",
+			"ColumnCount": 3,
+			"RowCount": 3,
+			"DataType": "int32",
+			"FormatStr": "%d",
+			"Name": "Настройки RS-485",
+			"Desc": "",
+			"NeedParamPrepare": false,
+			"Columns": [
+				{
+					"Column": 0,
+					"Name": "UART1",
+					"Type": "Regular"
+				},
+				{
+					"Column": 1,
+					"Name": "UART2",
+					"Type": "Regular"
+				},
+				{
+					"Column": 2,
+					"Name": "UART3",
+					"Type": "Regular"
+				}
+			],
+			"Rows": [
+				{
+					"Row": 0,
+					"Name": "Адрес устройства",
+					"FormatStr": "%d",
+					"Type": "Regular"
+				},
+				{
+					"Row": 1,
+					"Name": "Скорость бит/сек",
+					"FormatStr": "%d",
+					"Type": "Regular"
+				},
+				{
+					"Row": 2,
+					"Name": "Протокол (0-Unicorn, 1-ModbusRTU)",
+					"FormatStr": "%d",
+					"Type": "Regular"
+				}
+			]
+		}
+	],
 	"Flashes": [
 		{
 			"Name": "Flash memory for saving settings",

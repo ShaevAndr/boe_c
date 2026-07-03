@@ -1,0 +1,22 @@
+/*=============================================================================
+2     Project: 
+3     Platform: GD32F470
+4     Filename: AccessTabParam.h
+5     Description:
+6     Version: 0.0
+7     Created: 2023.08.31
+8     Last modified: 2026.02.08
+9============================================================================*/
+
+#ifndef AccessTabParam_H
+#define AccessTabParam_H
+
+#include <stdint.h>
+
+uint8_t ReadTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
+											uint32_t offset, uint32_t wordSize, uint32_t stride,
+											uint32_t * size);
+uint8_t WriteTabParam (uint8_t NumUART, uint32_t NumParam, uint8_t * B,
+											uint32_t offset, uint32_t stride, uint32_t size);
+
+#endif

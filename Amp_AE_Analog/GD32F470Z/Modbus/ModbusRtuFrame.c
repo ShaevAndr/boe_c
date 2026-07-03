@@ -12,6 +12,7 @@
 #include "ModbusRtuFrame.h"
 #include "CommandParcerModbus.h"
 #include "ErrorHandler.h"
+#include "../drv_LEDs.h"
 #include "../Unicorn2/crc16.h"
 //--------------------------------------------------------------------------//
 
@@ -45,6 +46,8 @@ void ModbusRtuFrame_Process(uint8_t NumUART, uint8_t *Buff, uint32_t *pSize, uin
 		return;
 	}
 
+	PingActivitiLED ();
+	
 	// PDU starts after address, ends before CRC
 	uint8_t *pdu = &Buff[1];
 	uint32_t pduSize = frameSize - 3;

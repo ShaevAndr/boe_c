@@ -19,7 +19,6 @@
 #include "../Global/ParamSystem.h"
 #include "../Global/logger.h"
 #include "../Unicorn2/unicorn_uart_speed.h"
-#include "../drv_LEDs.h"
 #include "ModbusRtuRoutine.h"
 #include "ModbusRtuFrame.h"
 //--------------------------------------------------------------------------//
@@ -164,96 +163,107 @@ void ModbusRtuRoutine (void)
 
 	for (uint8_t uartNum = 0; uartNum < _RS485_MODBUS_COUNT; uartNum++)
 	{
-		rxCount = RtuGetRxCount (uartNum);
+		rxCount = RtuGetRxCount(uartNum);
+		
+		switch (RtuMode[uartNum])
+{
+    case RtuIdle:
+			if (rxCount > 0)
+      {
+				rx = RtuPopRx(uartNum);
 
-		if (rxCount > 0 && RtuMode[uartNum] != RtuTransmit)
-		{
-			do
-			{
-				rx = RtuPopRx (uartNum);
+        RtuMode[uartNum] = RtuReceive;
+        RtuIndex[uartNum] = 0;
+        BuffRtu[uartNum][RtuIndex[uartNum]++] = rx.byte;
+        RtuLastTick[uartNum] = rx.timestamp;
+			}
+			break;
 
-				switch (RtuMode[uartNum])
+    case RtuReceive:
+			while (rxCount > 0)
 				{
-					case RtuIdle:
-						// Первый байт — начало нового кадра
-						RtuMode[uartNum] = RtuReceive;
-						RtuIndex[uartNum] = 0;
-						BuffRtu[uartNum][RtuIndex[uartNum]++] = rx.byte;
-						RtuLastTick[uartNum] = rx.timestamp;
-						break;
+					rx = RtuPopRx(uartNum);
+					rxCount--;
 
-					case RtuReceive:
-					{
-						uint16_t gap = (uint16_t)(rx.timestamp - RtuLastTick[uartNum]);
-						if (gap > RtuT15Us[uartNum])
-						{
-							// Нарушение inter-char timing — текущий накопленный
-							// кадр невалиден. Дропаем буфер, текущий байт
-							// становится началом нового кадра. Если это шум —
-							// CRC отбракует на стадии валидации.
-							RtuFrameErrors[uartNum]++;
-							CLOG_WARNING ("RTU%u: inter-char gap %uus > t1.5 %uus, dropping %u bytes",
-								(unsigned)uartNum, (unsigned)gap,
-								(unsigned)RtuT15Us[uartNum],
-								(unsigned)RtuIndex[uartNum]);
-							RtuIndex[uartNum] = 0;
-						}
-						if (RtuIndex[uartNum] < MODBUS_RTU_MAX_FRAME_SIZE)
-						{
-							BuffRtu[uartNum][RtuIndex[uartNum]++] = rx.byte;
-						}
-						RtuLastTick[uartNum] = rx.timestamp;
-						break;
+          uint16_t gap = (uint16_t)(rx.timestamp - RtuLastTick[uartNum]);
+
+          if (gap >= RtuT35Us[uartNum])
+          {
+						RtuIndex[uartNum] = 0; // новый кадр
+          }
+          else if (gap > RtuT15Us[uartNum])
+          {
+						RtuFrameErrors[uartNum]++;
+            RtuIndex[uartNum] = 0;
 					}
 
-					case RtuTransmit:
-						break;
-				}
-			} while (--rxCount);
-		}
+          if (RtuIndex[uartNum] < MODBUS_RTU_MAX_FRAME_SIZE)
+          {
+						BuffRtu[uartNum][RtuIndex[uartNum]++] = rx.byte;
+					}
 
-		// Конец кадра по тишине t3.5, измеряемой от момента физического
-		// приёма последнего байта (Timer12), а не от момента опроса.
-		if (RtuMode[uartNum] == RtuReceive)
-		{
-			uint16_t silence = (uint16_t)(RS485_GetTick () - RtuLastTick[uartNum]);
-			if (silence >= RtuT35Us[uartNum])
-			{
-				RtuSize[uartNum] = RtuIndex[uartNum];
+            RtuLastTick[uartNum] = rx.timestamp;
+        }
 
-				uint8_t deviceAddr = gParamSystem.rs485Modbus[uartNum].ModbusAddress;
-				ModbusRtuFrame_Process (uartNum, BuffRtu[uartNum], &RtuSize[uartNum], deviceAddr);
-				PingActivitiLED ();
+        if (RtuIndex[uartNum] > 0)
+        {
+					uint16_t silence = (uint16_t)(RS485_GetTick() - RtuLastTick[uartNum]);
 
-				if (RtuSize[uartNum] > 0)
-				{
-					RtuMode[uartNum] = RtuTransmit;
-					RtuIndex[uartNum] = 0;
-					RtuTxTO[uartNum] = SetTime_ms (0);
-				}
-				else
-				{
-					RtuMode[uartNum] = RtuIdle;
-				}
-			}
-		}
+          if (silence >= RtuT35Us[uartNum])
+          {
+						RtuSize[uartNum] = RtuIndex[uartNum];
 
-		// Передача ответа
-		if (RtuMode[uartNum] == RtuTransmit && EndTime (RtuTxTO[uartNum]))
-		{
-			uint32_t txFree = RtuGetTxFree (uartNum);
-			if (txFree > 0) txFree--;
-			uint32_t toSend = min_u32 (txFree, RtuSize[uartNum]);
-			if (toSend > 0)
-			{
-				toSend = RtuPushTxBuf (uartNum, &BuffRtu[uartNum][RtuIndex[uartNum]], toSend);
-				RtuIndex[uartNum] += toSend;
-				RtuSize[uartNum] -= toSend;
-				if (RtuSize[uartNum] == 0)
-				{
-					RtuMode[uartNum] = RtuIdle;
-				}
-			}
+						uint8_t deviceAddr = gParamSystem.rs485Modbus[uartNum].ModbusAddress;
+
+            ModbusRtuFrame_Process(
+							uartNum,
+              BuffRtu[uartNum],
+              &RtuSize[uartNum],
+              deviceAddr
+            );
+
+            if (RtuSize[uartNum] > 0)
+            {
+							RtuMode[uartNum] = RtuTransmit;
+              RtuIndex[uartNum] = 0;
+              RtuTxTO[uartNum] = SetTime_ms(0);
+            }
+            else
+            {
+							RtuMode[uartNum] = RtuIdle;
+              RtuIndex[uartNum] = 0;
+            }
+          }
+        }
+        break;
+
+    case RtuTransmit:
+        if (EndTime(RtuTxTO[uartNum]))
+        {
+					uint32_t txFree = RtuGetTxFree(uartNum);
+          if (txFree > 0) txFree--;
+
+          uint32_t toSend = min_u32(txFree, RtuSize[uartNum]);
+
+          if (toSend > 0)
+          {
+						toSend = RtuPushTxBuf(
+							uartNum,
+              &BuffRtu[uartNum][RtuIndex[uartNum]],
+              toSend
+            );
+
+            RtuIndex[uartNum] += toSend;
+            RtuSize[uartNum] -= toSend;
+
+            if (RtuSize[uartNum] == 0)
+            {
+							RtuMode[uartNum] = RtuIdle;
+              RtuIndex[uartNum] = 0;
+            }
+          }
+        }
+        break;
 		}
 	}
 }
