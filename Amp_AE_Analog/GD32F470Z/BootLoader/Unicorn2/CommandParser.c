@@ -25,6 +25,7 @@
 #include "CommandParserFloatParam.h"
 #include "CommandParserIntParam.h"
 #include "CommandParserTelemParam.h"
+#include "CommandParserTabParam.h"
 #include "CommandFlashMem.h"
 #include "unicorn_uart_speed.h"
 #include "CommandParser.h"
@@ -78,6 +79,18 @@ uint8_t CommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 	  case _ReadFlashMemParam:	//команда чтения параметров Flash памяти
 	  case _ReadDescrFlashMem:	//получить описание flash-памяти
 			ErrorNum = FlashParam (NumUART, Command, Buff + 2, pSize);
+			break;
+//====================================================
+		case _RequestNumTabParam:			//Запрос количества табличных параметров
+		case _GetDescrTabParam:				//Получить описание табличного параметра
+		case _ReadTabParamData:				//Чтение данных табличного параметра
+		case _WritingTabParamData: 		//Запись данных табличного параметра
+		case _PreparTabParam:					//Подготовка табличного параметра
+		case _ReqProgrPreparTabParam:	//Запрос прогресса подготовки
+		case _ReleaseTabParamData:		//Освободить данные параметра
+			*pSize -= 2;
+			ErrorNum = TabParam (NumUART, Command, Buff + 2, pSize);
+			if (_NoError == ErrorNum) *pSize += 2;
 			break;
 //====================================================
     case _RequestNumParam://Запрос количества доступных параметров

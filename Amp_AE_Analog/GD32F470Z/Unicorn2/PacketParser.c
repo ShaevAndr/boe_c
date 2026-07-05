@@ -15,7 +15,6 @@
 #include "../drv_LEDs.h"
 #include "CommandParser.h"
 #include "ParamSystem.h"
-#include "unicorn_uart_speed.h"
 #include "PacketParser.h"
 //--------------------------------------------------------------------------//
 PacketParserParam_t PacketParserParam [_PacketParsersCount];
@@ -220,7 +219,6 @@ void PacketParser_Init(void)
 {
   for (int i = 0; i < _RS485_MODBUS_COUNT; i++)
   {
-    RS485_Init (i, unicorn_uart_speed_to_baudrate(gParamSystem.rs485Modbus[i].UARTSpeed));
     PacketParser_SetDeviceAddress (i, gParamSystem.rs485Modbus[i].ModbusAddress);
   }
   for (int i = _RS485_MODBUS_COUNT; i < _PacketParsersCount; i++)

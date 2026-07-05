@@ -19,6 +19,9 @@
 #define PARAMSAVED_MAC_ADDR_LEN          (6)
 #define PARAMSAVED_RS485_MODBUS_COUNT    (4)
 
+#define PROTOCOL_UNICORN                 (0)
+#define PROTOCOL_MODBUS                  (1)
+
 #pragma pack(1)
 typedef struct
 {

@@ -138,7 +138,6 @@ void ModbusRtuRoutine_Init (void)
 	for (int i = 0; i < _RS485_MODBUS_COUNT; i++)
 	{
 		uint32_t baudrate = unicorn_uart_speed_to_baudrate (gParamSystem.rs485Modbus[i].UARTSpeed);
-		RS485_Init (i, baudrate);
 		RtuT35Us[i]       = CalcT35Us (baudrate);
 		RtuT15Us[i]       = CalcT15Us (baudrate);
 		RtuMode[i]        = RtuIdle;
@@ -163,6 +162,14 @@ void ModbusRtuRoutine (void)
 
 	for (uint8_t uartNum = 0; uartNum < _RS485_MODBUS_COUNT; uartNum++)
 	{
+		if (gParamSystem.rs485Modbus[uartNum].ProtocolMode != PROTOCOL_MODBUS)
+		{
+			RtuMode[uartNum] = RtuIdle;
+			RtuIndex[uartNum] = 0;
+			RtuSize[uartNum] = 0;
+			continue;
+		}
+
 		rxCount = RtuGetRxCount(uartNum);
 		
 		switch (RtuMode[uartNum])

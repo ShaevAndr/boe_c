@@ -186,7 +186,7 @@ void Unicorn2Routine (void)
   if (Init == 0)
   {
   	Init = 1;
-  	for (t = 0; t <= _MaxUARTNumber; t++)
+	for (t = 0; t < _MaxUARTNumber; t++)
   	{
 	  	Mode [t] = Idle;
 	  	IndexBuff [t] = 0;
@@ -198,15 +198,20 @@ void Unicorn2Routine (void)
   	}
   }
 
-	for (UARTNumber = 0; UARTNumber <= _MaxUARTNumber; UARTNumber++)
+	for (UARTNumber = 0; UARTNumber < _MaxUARTNumber; UARTNumber++)
 	{
-	  t = GetNumberOfByteRxFIFO (UARTNumber);
-	  if (t)		
-	  {
-	  	if ((Mode [UARTNumber] != Transmite))
-	  	{
-		    do
-		    {
+		if ((UARTNumber >= _RS485_MODBUS_COUNT) ||
+			(gParamSystem.rs485Modbus[UARTNumber].ProtocolMode ==
+				PROTOCOL_UNICORN) ||
+			(Mode[UARTNumber] == Transmite))
+		{
+		  t = GetNumberOfByteRxFIFO (UARTNumber);
+		  if (t)
+		  {
+			if ((Mode [UARTNumber] != Transmite))
+			{
+			    do
+			    {
 		      RxB = PopRxFIFO (UARTNumber);
 		 			Unicorn2RoutineParam [UARTNumber].TotalRxByte++;
 		      switch (Mode [UARTNumber])
@@ -259,31 +264,39 @@ void Unicorn2Routine (void)
 //		          break;
 		      }
 		    } while (--t);
-	  	}
-	  }
+			}
+		  }
 
-	  if ((Mode [UARTNumber] == Transmite) && EndTime (TxTO [UARTNumber]))
-	  { // пытаемся передать если необходимо
-			t=GetNumberOfFreeByteTxFIFO (UARTNumber);
-			if (t>0)t--;
-	    t = min_uint32 (t, SizeBuff [UARTNumber]);
-	    if (t > 0)
-	    {
-				//TxTO [UARTNumber] = SetTime_ms (50);
-	      t = PushTxFIFOBuf (UARTNumber, &(BuffRS485 [UARTNumber][IndexBuff [UARTNumber]]), t);
-	      IndexBuff [UARTNumber] += t;
-	      Unicorn2RoutineParam [UARTNumber].TotalTxByte += t;
-	      SizeBuff [UARTNumber] -= t;
+		  if ((Mode [UARTNumber] == Transmite) && EndTime (TxTO [UARTNumber]))
+		  { // пытаемся передать если необходимо
+				t=GetNumberOfFreeByteTxFIFO (UARTNumber);
+				if (t>0)t--;
+		    t = min_uint32 (t, SizeBuff [UARTNumber]);
+		    if (t > 0)
+		    {
+					//TxTO [UARTNumber] = SetTime_ms (50);
+		      t = PushTxFIFOBuf (UARTNumber, &(BuffRS485 [UARTNumber][IndexBuff [UARTNumber]]), t);
+		      IndexBuff [UARTNumber] += t;
+		      Unicorn2RoutineParam [UARTNumber].TotalTxByte += t;
+		      SizeBuff [UARTNumber] -= t;
 //				printf ("%04X", t);
-	      if (SizeBuff [UARTNumber] == 0)
-				{
-	        Mode [UARTNumber] = Idle;
+		      if (SizeBuff [UARTNumber] == 0)
+					{
+		        Mode [UARTNumber] = Idle;
 //					printf ("Idly");
-				}
+					}
 //	      StartTx (UARTNumber);
-	    }
-	  }
-    if (UARTNumber < _RS485_MODBUS_COUNT)
+				}
+		  }
+		}
+		else
+		{
+			Mode[UARTNumber] = Idle;
+			IndexBuff[UARTNumber] = 0;
+			SizeBuff[UARTNumber] = 0;
+		}
+
+	    if (UARTNumber < _RS485_MODBUS_COUNT)
     {
       if ((NeedSetSpeedFlag [UARTNumber] != 0)
         && (Mode [UARTNumber] == Idle)

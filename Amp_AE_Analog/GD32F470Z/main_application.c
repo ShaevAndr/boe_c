@@ -46,6 +46,18 @@ static void ResetRoutine (void)
   NVIC_SystemReset ();
 }
 //--------------------------------------------------------------------------//
+static void InitRS485Interfaces (void)
+{
+  uint32_t i;
+
+  for (i = 0; i < _RS485_Count; i++)
+  {
+    RS485_Init ((TRS485_Channel)i,
+      unicorn_uart_speed_to_baudrate (
+        gParamSystem.rs485Modbus[i].UARTSpeed));
+  }
+}
+//--------------------------------------------------------------------------//
 int main (void)
 {
   {
@@ -74,14 +86,9 @@ int main (void)
   loadLockUnlockStatus();
   CommandParserInit();
 
-  if (gParamSystem.ProtocolMode == PROTOCOL_MODBUS)
-  {
-    ModbusRtuRoutine_Init();
-  }
-  else
-  {
-    PacketParser_Init();
-  }
+  InitRS485Interfaces();
+  PacketParser_Init();
+  ModbusRtuRoutine_Init();
     
   InitMonADC0 ();
   InitMonADC1 ();
@@ -121,10 +128,8 @@ int main (void)
 			}
 		}
 		
-    if (gParamSystem.ProtocolMode == PROTOCOL_MODBUS)
-      ModbusRtuRoutine();
-    else
-      Unicorn2Routine();
+    Unicorn2Routine();
+    ModbusRtuRoutine();
 		
     RoutineMonADC0 ();
     RoutineMonADC1 ();

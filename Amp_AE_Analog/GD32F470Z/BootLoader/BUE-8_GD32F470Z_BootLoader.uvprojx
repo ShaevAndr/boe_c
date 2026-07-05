@@ -620,6 +620,26 @@
               <FilePath>.\Unicorn2\CommandParserTelemParam.h</FilePath>
             </File>
             <File>
+              <FileName>CommandParserTabParam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Unicorn2\CommandParserTabParam.c</FilePath>
+            </File>
+            <File>
+              <FileName>CommandParserTabParam.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Unicorn2\CommandParserTabParam.h</FilePath>
+            </File>
+            <File>
+              <FileName>AccessTabParam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Unicorn2\AccessTabParam.c</FilePath>
+            </File>
+            <File>
+              <FileName>AccessTabParam.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Unicorn2\AccessTabParam.h</FilePath>
+            </File>
+            <File>
               <FileName>CommandFlashMem.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Unicorn2\CommandFlashMem.c</FilePath>
