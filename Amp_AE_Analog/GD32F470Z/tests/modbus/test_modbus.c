@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "../../Modbus/CommandParcerModbus.h"
+#include "../../Modbus/Backend/ModbusBackend.h"
+#include "../../Modbus/Core/ModbusCore.h"
 #include "../../Modbus/Diagnostics.h"
 #include "../../Modbus/ErrorHandler.h"
 #include "../../Modbus/ModbusRtuFrame.h"
@@ -33,10 +35,28 @@
 
 static unsigned testsRun;
 static unsigned testsFailed;
+static unsigned portableBackendCalls;
+static unsigned portableActivityCalls;
 
 /* ModbusRtuFrame signals activity through this board-specific hook. */
 void PingActivitiLED(void)
 {
+}
+
+static uint8_t PortableBackendProcess(void *context, uint8_t *pdu,
+	uint32_t *pduSize)
+{
+	(void)context;
+	portableBackendCalls++;
+	pdu[1] = 0xA5U;
+	*pduSize = 2U;
+	return _NoError;
+}
+
+static void PortableBackendActivity(void *context)
+{
+	(void)context;
+	portableActivityCalls++;
 }
 
 #define CHECK(condition) \
@@ -911,6 +931,29 @@ static int TestRtuNormalResponse(void)
 	return 1;
 }
 
+static int TestPortableCoreBackend(void)
+{
+	uint8_t frame[32] = {0};
+	const uint8_t pdu[] = {0x55U};
+	ModbusBackend backend;
+	uint32_t size;
+
+	portableBackendCalls = 0U;
+	portableActivityCalls = 0U;
+	backend.context = NULL;
+	backend.processPdu = PortableBackendProcess;
+	backend.frameActivity = PortableBackendActivity;
+	size = BuildRtuRequest(frame, 1U, pdu, sizeof(pdu));
+	ModbusCore_ProcessRtuFrame(&backend, frame, &size, 1U);
+	CHECK_EQ_U32(5U, size);
+	CHECK_EQ_U32(1U, portableBackendCalls);
+	CHECK_EQ_U32(1U, portableActivityCalls);
+	CHECK_EQ_U32(0x55U, frame[1]);
+	CHECK_EQ_U32(0xA5U, frame[2]);
+	CHECK(CheckRtuCrc(frame, size));
+	return 1;
+}
+
 static int TestRtuDropsInvalidFrames(void)
 {
 	uint8_t frame[32] = {0};
@@ -972,6 +1015,7 @@ int main(void)
 	RUN_TEST(TestReadDeviceIdentificationModesAndErrors);
 	RUN_TEST(TestCommandDispatcher);
 	RUN_TEST(TestRtuNormalResponse);
+	RUN_TEST(TestPortableCoreBackend);
 	RUN_TEST(TestRtuDropsInvalidFrames);
 	RUN_TEST(TestRtuExceptionAndBroadcast);
 

@@ -985,6 +985,21 @@
               <FilePath>.\Modbus\CommandParcerModbus.c</FilePath>
             </File>
             <File>
+              <FileName>ModbusCore.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\Core\ModbusCore.c</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusRtuPort.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\Port\ModbusRtuPort.c</FilePath>
+            </File>
+            <File>
+              <FileName>ModbusBackendGd32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Modbus\Backend\ModbusBackendGd32.c</FilePath>
+            </File>
+            <File>
               <FileName>ErrorHandler.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Modbus\ErrorHandler.h</FilePath>

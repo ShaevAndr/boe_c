@@ -3,6 +3,27 @@
 > **Внимание**: mapping регистров для FC 0x03/0x04/0x06/0x10 — проектный. Один "register address" в запросе соответствует одному **4-байтному параметру**. Поле ByteCount — 1-байтное (как в стандартном Modbus), но данные — 4 байта на параметр.
 
 Внешний контракт для программы Modbus-master описан в `Modbus/MASTER_PROTOCOL.md`.
+Пошаговая инструкция переноса и интеграции находится в `Modbus/INTEGRATION.md`.
+
+## Слои и перенос на другую платформу
+
+```
+Modbus/Core       RTU-кадр, CRC16 и обработка PDU; не зависит от МК/HAL
+       |
+Modbus/Backend    контракт `ModbusBackend`: PDU приложения и индикация кадра
+       |
+Modbus/Port       контракт `ModbusRtuPort`: RX/TX FIFO и микросекундный тик
+       |
+GD32 adapter      Backend/ModbusBackendGd32.c + ModbusRtuRoutine.c
+```
+
+`Core/ModbusCore.*` можно переносить без изменений. Для нового устройства нужны:
+
+1. Реализация `ModbusRtuPort` для UART/RS-485: `rxCount`, `rxPop` с временем фактического приёма байта, `tickUs`, `txFree`, `txWrite`.
+2. Реализация `ModbusBackend`: обычно PDU-диспетчер и доступ к модели параметров устройства. GD32-вариант находится в `Backend/ModbusBackendGd32.c`.
+3. Создание по одному `ModbusRtu` и `ModbusBackend` на порт, затем вызов `ModbusRtu_Init()` и регулярный `ModbusRtu_Poll()`.
+
+В `Core` и `Port` нет заголовков GD32, Unicorn2 или глобального числа UART. Это позволяет собирать RTU на host и создавать столько экземпляров, сколько нужно целевой платформе.
 
 ## Формат кадров
 
