@@ -2,7 +2,7 @@
      Project:
      Platform: GD32F470
      Filename: Diagnostics.c
-     Description: FC 0x08 - Diagnostics extensions for table parameters.
+     Description: User-defined FC 0x42 - table metadata/control extensions.
 ============================================================================*/
 #include "Diagnostics.h"
 #include "../Unicorn2/AccessTabParam.h"

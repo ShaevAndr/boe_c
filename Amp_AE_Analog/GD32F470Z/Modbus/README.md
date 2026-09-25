@@ -110,7 +110,7 @@ State machine с захватом таймстампов байтов в IRQ (Ti
 | `0x03` | 5       | `ReadHoldingsRegisters()`  | `ReadHoldingRegisters.c`    |
 | `0x04` | 5       | `ReadInputRegisters()`     | `ReadInputRegisters.c`      |
 | `0x06` | 7       | `WriteSingleRegister()`    | `WriteSingleRegister.c`     |
-| `0x08` | 3       | `Diagnostics()`            | `Diagnostics.c`             |
+| `0x42` | 3       | `Diagnostics()`            | `Diagnostics.c`             |
 | `0x2B/0x0E` | 4 | `ReadDeviceIdentification()` | `ReadDeviceIdentification.c` |
 | `0x10` | 10      | `WriteMultipleRegisters()` | `WriteMultipleRegisters.c`  |
 | `0x14` | 9       | `ReadFileRecord()`         | `ReadFileRecord.c`          |
@@ -169,7 +169,7 @@ CommandParcerModbus.c       <- проверка min PDU + switch по FC
     |---> ReadDeviceIdentification.c --> standard identification objects
     |---> ReadFileRecord.c --> device description (file 1) / AccessTabParam (files 100...)
     |---> WriteFileRecord.c --> AccessTabParam
-    |---> Diagnostics.c --> AccessTabParam
+    |---> Diagnostics.c (custom FC 0x42) --> AccessTabParam
     +---> WriteMultipleRegisters.c -> ModbusUtils.c --> AccessIntParam / AccessFloatParam
     |
     v                              ErrorHandler.c <- Unicorn -> Modbus exception

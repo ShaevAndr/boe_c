@@ -34,6 +34,11 @@
 static unsigned testsRun;
 static unsigned testsFailed;
 
+/* ModbusRtuFrame signals activity through this board-specific hook. */
+void PingActivitiLED(void)
+{
+}
+
 #define CHECK(condition) \
 	do \
 	{ \
@@ -719,7 +724,7 @@ static int TestTableFileRecords(void)
 
 static int TestDiagnosticsTableFunctions(void)
 {
-	uint8_t pdu[128] = {0x08U, 0U, MODBUS_DIAG_TABLE_COUNT};
+	uint8_t pdu[128] = {MODBUS_FC_CUSTOM_TABLE_CONTROL, 0U, MODBUS_DIAG_TABLE_COUNT};
 	uint32_t size = 3U;
 	uint32_t step;
 	const char expectedDescription[] =
@@ -728,11 +733,11 @@ static int TestDiagnosticsTableFunctions(void)
 
 	CHECK_EQ_U32(_NoError,
 		ReleaseTabParam(0U, MODBUS_TABLE_TEST_INDEX));
-	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 	CHECK_EQ_U32(7U, size);
 	CHECK_EQ_U32(1U, GetU32Be(&pdu[3]));
 
-	pdu[0] = 0x08U;
+	pdu[0] = MODBUS_FC_CUSTOM_TABLE_CONTROL;
 	pdu[1] = 0U;
 	pdu[2] = MODBUS_DIAG_TABLE_DESCRIPTION;
 	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
@@ -743,24 +748,24 @@ static int TestDiagnosticsTableFunctions(void)
 	CHECK_EQ_U32(strlen(expectedDescription), GetU32Be(&pdu[7]));
 	CHECK(memcmp(&pdu[11], expectedDescription, strlen(expectedDescription)) == 0);
 
-	pdu[0] = 0x08U;
+	pdu[0] = MODBUS_FC_CUSTOM_TABLE_CONTROL;
 	pdu[1] = 0U;
 	pdu[2] = MODBUS_DIAG_TABLE_PREPARE;
 	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
 	PutU32Be(&pdu[7], 3U);
 	size = 11U;
-	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 	CHECK_EQ_U32(11U, size);
 	CHECK_EQ_U32(3U, GetU32Be(&pdu[7]));
 
 	for (step = 1U; step <= FACTORY_CALIBRATION_STEPS; step++)
 	{
-		pdu[0] = 0x08U;
+		pdu[0] = MODBUS_FC_CUSTOM_TABLE_CONTROL;
 		pdu[1] = 0U;
 		pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
 		PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
 		size = 7U;
-		CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+		CHECK_EQ_U32(_NoError, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 		CHECK_EQ_U32(23U, size);
 		CHECK_EQ_U32(step, GetU32Be(&pdu[7]));
 		CHECK_EQ_U32(FACTORY_CALIBRATION_STEPS, GetU32Be(&pdu[11]));
@@ -768,25 +773,25 @@ static int TestDiagnosticsTableFunctions(void)
 		CHECK_EQ_U32(FACTORY_CALIBRATION_COLUMNS, GetU32Be(&pdu[19]));
 	}
 
-	pdu[0] = 0x08U;
+	pdu[0] = MODBUS_FC_CUSTOM_TABLE_CONTROL;
 	pdu[1] = 0U;
 	pdu[2] = MODBUS_DIAG_TABLE_RELEASE;
 	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
 	size = 7U;
-	CHECK_EQ_U32(_NoError, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(_NoError, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 	CHECK_EQ_U32(7U, size);
 
-	pdu[0] = 0x08U;
+	pdu[0] = MODBUS_FC_CUSTOM_TABLE_CONTROL;
 	pdu[1] = 0U;
 	pdu[2] = MODBUS_DIAG_TABLE_PREPARE_PROGRESS;
 	PutU32Be(&pdu[3], MODBUS_TABLE_TEST_INDEX);
 	size = 7U;
-	CHECK_EQ_U32(_SlaveDeviceBusy, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(_SlaveDeviceBusy, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 
 	pdu[2] = MODBUS_DIAG_TABLE_RELEASE;
 	PutU32Be(&pdu[3], 0x12345678UL);
 	size = 7U;
-	CHECK_EQ_U32(_IllegalDataAddress, Diagnostics(0U, 0x08U, pdu, &size));
+	CHECK_EQ_U32(_IllegalDataAddress, Diagnostics(0U, MODBUS_FC_CUSTOM_TABLE_CONTROL, pdu, &size));
 	return 1;
 }
 
@@ -878,6 +883,10 @@ static int TestCommandDispatcher(void)
 
 	pdu[0] = 0x7FU;
 	size = 1U;
+	CHECK_EQ_U32(_IllegalFunction, ModbusCommandProcess(0U, pdu, &size));
+
+	pdu[0] = 0x08U;
+	size = 3U;
 	CHECK_EQ_U32(_IllegalFunction, ModbusCommandProcess(0U, pdu, &size));
 	return 1;
 }

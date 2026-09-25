@@ -37,7 +37,10 @@
 	#define _ReadInputRegisters     0x04
 	#define _WriteSingleCoil        0x05
 	#define _WriteSingleRegister    0x06
-	#define _Diagnostics            0x08
+	/* User-defined function code for table metadata and control.
+	   FC 0x08 remains reserved for standard Modbus diagnostics. */
+	#define MODBUS_FC_CUSTOM_TABLE_CONTROL 0x42U
+	#define _CustomTableControl     MODBUS_FC_CUSTOM_TABLE_CONTROL
 	#define _EncapsulatedInterfaceTransport 0x2B
 	#define _WriteMultipleCoils     0x0F
 	#define _WriteMultipleRegisters 0x10

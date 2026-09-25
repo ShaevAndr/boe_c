@@ -49,7 +49,7 @@ uint8_t ModbusCommandProcess (uint8_t NumUART, uint8_t * Buff, uint32_t * pSize)
 			if (reqSize < MIN_PDU_WRITE_SINGLE) return _IllegalDataValue;
 			return WriteSingleRegister(NumUART, Command, Buff, pSize);
 
-		case _Diagnostics:
+		case _CustomTableControl:
 			if (reqSize < MIN_PDU_DIAGNOSTICS) return _IllegalDataValue;
 			return Diagnostics(NumUART, Command, Buff, pSize);
 

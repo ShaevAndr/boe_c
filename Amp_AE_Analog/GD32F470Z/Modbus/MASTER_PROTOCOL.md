@@ -62,7 +62,7 @@ Input addresses are `0..82` telemetry parameters.
 | `0x03` | Read Holding Registers / parameters | read INT/FLOAT | `ReadHoldingRegisters()` |
 | `0x04` | Read Input Registers / telemetry | read TELEMETRY | `ReadInputRegisters()` |
 | `0x06` | Write Single Register / parameter | write INT/FLOAT | `WriteSingleRegister()` |
-| `0x08` | Diagnostics extensions | table metadata/control | `Diagnostics()` |
+| `0x42` | Custom table control | table metadata/control | `Diagnostics()` |
 | `0x10` | Write Multiple Registers / parameters | write INT/FLOAT | `WriteMultipleRegisters()` |
 | `0x14` | Read File Record | device description and table bytes | `ReadFileRecord()` |
 | `0x15` | Write File Record | table bytes | `WriteFileRecord()` |
@@ -276,22 +276,22 @@ Request PDU:  15 0B 06 00 64 00 02 00 02 AA BB CC DD
 Response PDU: 15 0B 06 00 64 00 02 00 02 AA BB CC DD
 ```
 
-## FC 0x08 - Diagnostics table extensions
+## FC 0x42 - Custom table control
 
-Diagnostics is used here for table metadata/control. Subfunction is bytes `[1..2]` of the PDU, big-endian.
+`0x42` is a user-defined function code for table metadata/control. It is not the standard Modbus Diagnostics FC `0x08`. Subfunction is bytes `[1..2]` of the PDU, big-endian.
 
 ### Subfunction 0x0005 - table count
 
 Request PDU:
 
 ```text
-[08][00][05]
+[42][00][05]
 ```
 
 Response PDU:
 
 ```text
-[08][00][05][Count_B3][Count_B2][Count_B1][Count_B0]
+[42][00][05][Count_B3][Count_B2][Count_B1][Count_B0]
 ```
 
 Current `Count = 1`.
@@ -301,13 +301,13 @@ Current `Count = 1`.
 Request PDU:
 
 ```text
-[08][00][06][TableIndex_B3][TableIndex_B2][TableIndex_B1][TableIndex_B0]
+[42][00][06][TableIndex_B3][TableIndex_B2][TableIndex_B1][TableIndex_B0]
 ```
 
 Response PDU:
 
 ```text
-[08][00][06][TableIndex:4][DescriptionSize:4][ASCII Description...]
+[42][00][06][TableIndex:4][DescriptionSize:4][ASCII Description...]
 ```
 
 Current table index `0` description is `FactoryCalibrationParameters; file=100; rows=4; columns=6; data=float32; bytes=96`.
@@ -317,10 +317,10 @@ Current table index `0` description is `FactoryCalibrationParameters; file=100; 
 Request PDU:
 
 ```text
-[08][00][07][TableIndex:4][Column:4]
+[42][00][07][TableIndex:4][Column:4]
 ```
 
-Response PDU echoes `[08][00][07][TableIndex:4][Column:4]`.
+Response PDU echoes `[42][00][07][TableIndex:4][Column:4]`.
 
 `Column` is signed int32 BE. This subfunction always means read preparation (`mode = 0` in the Unicorn table protocol), so no separate mode field is transmitted. For table index `0`, it starts a new four-stage preparation and invalidates any previous snapshot.
 
@@ -329,13 +329,13 @@ Response PDU echoes `[08][00][07][TableIndex:4][Column:4]`.
 Request PDU:
 
 ```text
-[08][00][08][TableIndex:4]
+[42][00][08][TableIndex:4]
 ```
 
 Response PDU:
 
 ```text
-[08][00][08][TableIndex:4][CurrentStep:4][StepsCount:4][Rows:4][Columns:4]
+[42][00][08][TableIndex:4][CurrentStep:4][StepsCount:4][Rows:4][Columns:4]
 ```
 
 For table index `0`, successive progress requests return `CurrentStep=1..4`, `StepsCount=4`, `Rows=4`, `Columns=6`. Each request prepares one row. Further requests remain at step `4`; requests before preparation or after release return `SlaveDeviceBusy`.
@@ -345,10 +345,10 @@ For table index `0`, successive progress requests return `CurrentStep=1..4`, `St
 Request PDU:
 
 ```text
-[08][00][09][TableIndex:4]
+[42][00][09][TableIndex:4]
 ```
 
-Response PDU echoes `[08][00][09][TableIndex:4]`.
+Response PDU echoes `[42][00][09][TableIndex:4]`.
 
 ## FC 0x2B / MEI 0x0E - Read Device Identification
 
